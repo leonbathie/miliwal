@@ -15,13 +15,13 @@
 ### Lewruuji (12 lewruuji)
 
 1. Janwiyee
-2. Feburuyee
+2. Februyee
 3. Mars
 4. Awril
 5. Mee
 6. Juwe
 7. Juyyee
-8. Awuut
+8. Awut
 9. Setembar
 10. Oktoobar
 11. Nowembar
