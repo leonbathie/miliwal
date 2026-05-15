@@ -2,7 +2,7 @@
 
 ## Kalandiriye Fulfulde
 
-### Ñalɗi e yontere
+### ñalɗi e yontere
 
 - Altine
 - Talaata
@@ -15,13 +15,13 @@
 ### Lewruuji (12 lewruuji)
 
 1. Janwiyee
-2. Fewriyee
+2. Feeburiyee
 3. Mars
 4. Awril
 5. Mee
 6. Juwe
 7. Juyyee
-8. Awut
+8. Awuut
 9. Setembar
 10. Oktoobar
 11. Nowembar
