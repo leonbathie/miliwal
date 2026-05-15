@@ -15,7 +15,7 @@
 ### Lewruuji (12 lewruuji)
 
 1. Janwiyee
-2. Feburiyee
+2. Feburuyee
 3. Mars
 4. Awril
 5. Mee
