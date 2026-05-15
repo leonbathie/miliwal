@@ -1,6 +1,6 @@
 # miliwal
 
-## Kalandiriye Fulfulde
+## Kalenndiriye Fulfulde
 
 ### ñalɗi e yontere
 
@@ -15,7 +15,7 @@
 ### Lewruuji (12 lewruuji)
 
 1. Janwiyee
-2. Feeburiyee
+2. Febburiyee
 3. Mars
 4. Awril
 5. Mee
