@@ -21,7 +21,7 @@
 5. Mee
 6. Juwe
 7. Juyyee
-8. Ut
+8. Awut
 9. Setembar
 10. Oktoobar
 11. Nowembar
