@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendrier Fulfulde — Temps, Météo & Astres</title>
+    <!-- Librairie SunCalc pour l'astronomie réelle -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+    <!-- Librairie Chart.js pour les graphiques avancés -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Palette de couleurs élégante et culturelle */
+            --bg-dark: #07101f;
+            --bg-panel: #0d1b32;
+            --plum-dark: #2A0A2B;
+            --plum: #4A154B;
+            --plum-light: #7a287c;
+            --gold: #D4AF37;
+            --gold-light: #f1d370;
+            --cream: #FFFDD0;
+            --off-white: #F5F5F5;
+            --text-main: #F5F5F5;
+            --text-muted: #b0c4de;
+            --sci-blue: #4facfe;
+            --danger: #ff4757;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Georgia', serif;
+            color: var(--gold);
+            font-weight: normal;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--plum-dark);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-bottom: 2px solid var(--gold);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav button, .lang-select {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: 'Georgia', serif;
+        }
+
+        .lang-select {
+            background: var(--bg-panel);
+            appearance: none;
+            padding-right: 30px;
+            text-align: center;
+        }
+
+        nav button.active, nav button:hover, .lang-select:hover {
+            background: var(--gold);
+            color: var(--bg-dark);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards générales */
+        .card {
+            background: linear-gradient(145deg, var(--bg-panel), var(--plum-dark));
+            border: 1px solid var(--gold);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, var(--gold), var(--plum));
+        }
+
+        /* EN-TÊTE UNIFIÉE PRO (Hero Header / Ephéméride) */
+        .header-cal {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, rgba(13, 27, 50, 0.8), rgba(42, 10, 43, 0.8));
+            padding: 40px 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-cal::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 5px; height: 100%;
+            background: linear-gradient(180deg, var(--gold), var(--plum));
+        }
+
+        .header-cal h1 {
+            font-size: 2.8em;
+            margin: 0 0 5px 0;
+            color: var(--gold);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            line-height: 1.1;
+        }
+
+        .year-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .year-selector label {
+            color: var(--text-muted);
+            font-size: 1.1em;
+        }
+
+        .year-selector select {
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--gold);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            padding: 6px 15px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .year-selector select:hover {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .clock-date-text {
+            color: var(--text-muted);
+            font-size: 1.2em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .clock-time {
+            font-size: 4.5em;
+            color: var(--gold-light);
+            font-family: monospace;
+            font-weight: bold;
+            line-height: 1;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+            margin: 5px 0;
+        }
+
+        .clock-moment-text {
+            color: var(--cream);
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 10px 0 15px 0;
+            letter-spacing: 0.5px;
+            border: 2px solid rgba(122, 40, 124, 0.8);
+            padding: 8px 30px;
+            border-radius: 30px;
+            background: rgba(42, 10, 43, 0.5);
+            display: inline-block;
+            box-shadow: 0 0 15px rgba(122, 40, 124, 0.6);
+        }
+
+        .scientific-time-data {
+            font-family: monospace;
+            font-size: 0.9em;
+            color: var(--sci-blue);
+            background: transparent;
+            padding: 6px 15px;
+            border-radius: 5px;
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .clock-fulfulde {
+            font-size: 1.2em;
+            color: var(--gold);
+            font-style: italic;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .btn-audio {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            color: var(--gold-light);
+            padding: 8px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            margin: 0 auto;
+        }
+        
+        .btn-audio:hover { 
+            background: var(--gold); 
+            color: var(--bg-dark); 
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Barre Ephéméride intégrée */
+        .header-ephemeris {
+            display: flex;
+            gap: 15px;
+            border-top: 1px solid rgba(212, 175, 55, 0.3);
+            padding-top: 25px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .ephemeris-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            color: var(--cream);
+            font-size: 15px;
+        }
+
+        .eph-label { 
+            color: var(--text-muted); 
+            font-size: 12px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin-right: 5px;
+        }
+
+        .eph-value { 
+            color: var(--gold); 
+            font-weight: bold; 
+        }
+
+        /* Grille des mois */
+        .months-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .month-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--plum-light);
+            border-radius: 10px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .month-header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 10px;
+            position: relative;
+        }
+
+        .month-header h3 { color: var(--gold); margin-bottom: 5px;}
+        .month-header span { color: var(--text-muted); font-size: 14px;}
+        
+        .month-season-icon {
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 24px;
+            opacity: 0.5;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .day-label {
+            color: var(--gold-light);
+            font-weight: bold;
+            font-size: 12px;
+            padding-bottom: 5px;
+        }
+
+        .day-cell {
+            padding: 8px 0;
+            font-size: 14px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .day-cell.empty { background: transparent; }
+        .day-cell.today { 
+            background: var(--plum); 
+            color: var(--cream); 
+            border: 1px solid var(--gold);
+            font-weight: bold;
+        }
+
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .info-cards ul { list-style: none; }
+        .info-cards li { margin-bottom: 5px; font-size: 14px; border-bottom: 1px dotted rgba(255,255,255,0.1); padding-bottom: 3px;}
+        .info-cards strong { color: var(--gold-light); }
+
+        /* Dashboard Météo & Astres */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: var(--bg-panel);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--plum);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .col-4 { grid-column: span 4; }
+        .col-8 { grid-column: span 8; }
+        .col-6 { grid-column: span 6; }
+        .col-12 { grid-column: span 12; }
+
+        @media(max-width: 1024px) {
+            .col-4, .col-8, .col-6 { grid-column: span 12; }
+        }
+
+        .current-weather {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .weather-icon {
+            font-size: 64px;
+        }
+
+        .temp-huge {
+            font-size: 48px;
+            color: var(--cream);
+            line-height: 1;
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        
+        .weather-details div {
+            background: rgba(0,0,0,0.2);
+            padding: 8px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .weather-details div span:first-child {
+            color: var(--text-muted);
+        }
+        
+        .weather-details div span:last-child {
+            font-weight: bold;
+            color: var(--cream);
+        }
+
+        /* Barres de progression météo */
+        .progress-bar-bg {
+            width: 50px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            display: inline-block;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--gold);
+            border-radius: 3px;
+        }
+
+        .agri-details {
+            border-top: 1px dashed var(--gold);
+            margin-top: 15px;
+            padding-top: 10px;
+        }
+        .agri-title {
+            font-size: 12px;
+            color: var(--gold-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        /* Chart container */
+        .chart-container {
+            width: 100%;
+            height: 250px;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .daily-forecast {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .daily-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 3px solid var(--gold);
+        }
+
+        /* Boussole et Canvas Astro */
+        .canvas-container {
+            width: 100%;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .canvas-overlay-text {
+            position: absolute;
+            bottom: 10px;
+            text-align: center;
+            width: 100%;
+            font-size: 14px;
+            color: var(--cream);
+        }
+
+        /* Boussole Visuelle */
+        .compass-container {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            position: relative;
+            margin: 0 auto;
+            background: radial-gradient(circle, rgba(13, 27, 50, 0.8) 0%, rgba(42, 10, 43, 0.8) 100%);
+        }
+        
+        .compass-point {
+            position: absolute;
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+        .compass-point.n { top: 2px; left: 50%; transform: translateX(-50%); color: var(--danger); }
+        .compass-point.s { bottom: 2px; left: 50%; transform: translateX(-50%); }
+        .compass-point.e { right: 5px; top: 50%; transform: translateY(-50%); }
+        .compass-point.w { left: 5px; top: 50%; transform: translateY(-50%); }
+
+        .compass-indicator {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100%;
+            height: 2px;
+            transform-origin: 0 50%;
+            z-index: 2;
+        }
+        
+        .compass-sun-icon {
+            position: absolute;
+            right: -10px; top: -10px;
+            font-size: 18px;
+            text-shadow: 0 0 10px var(--gold);
+        }
+        .compass-moon-icon {
+            position: absolute;
+            right: -10px; top: -10px;
+            font-size: 16px;
+            filter: drop-shadow(0 0 5px #FFFDD0);
+        }
+
+        .astro-times {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+
+        .astro-times div {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dotted rgba(255,255,255,0.2);
+            padding-bottom: 3px;
+        }
+
+        .sci-astro-data {
+            font-family: monospace;
+            color: var(--sci-blue);
+            font-size: 11px;
+            margin-top: 10px;
+            background: rgba(0,0,0,0.3);
+            padding: 8px;
+            border-radius: 5px;
+        }
+        .sci-astro-data div {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .fulfulde-reading {
+            background: var(--plum-dark);
+            border-left: 4px solid var(--gold);
+            padding: 15px;
+            font-style: italic;
+            color: var(--cream);
+            margin-top: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .btn-action {
+            background: var(--plum);
+            color: var(--off-white);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        .btn-action:hover { background: var(--plum-light); }
+
+        /* Print styles */
+        @media print {
+            body { background: #fff; color: #000; }
+            nav, .btn-action, .btn-audio, .year-selector { display: none; }
+            .card, .month-card, .header-cal { background: #fff !important; border: 1px solid #ccc; box-shadow: none; color: #000; }
+            h1, h2, h3, .gold, .clock-time, .temp-huge, .eph-value, .eph-label, .sci-astro-data { color: #000; }
+            .day-cell { color: #000; }
+            .day-cell.today { border: 2px solid #000; background: #eee; color: #000; }
+            * { text-shadow: none !important; }
+            .tab-content { display: block !important; page-break-after: always; }
+            .ephemeris-item { border: 1px solid #000; color: #000; background: transparent; }
+            .clock-moment-text { background: transparent; color: #000; border: 1px solid #000; box-shadow: none; }
+            .chart-container { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <select id="lang-select" class="lang-select" onchange="changeLanguage()">
+            <option value="fr">🇫🇷 Français</option>
+            <option value="ff">🌍 Fulfulde</option>
+            <option value="en">🇬🇧 English</option>
+        </select>
+        <button id="btn-tab-cal" class="active" onclick="switchTab('cal')" data-i18n="nav_cal">📅 Calendrier simple</button>
+        <button id="btn-tab-meteo" onclick="switchTab('meteo')" data-i18n="nav_meteo">🌌 Météo & Astres</button>
+        <button onclick="window.print()" data-i18n="nav_print">🖨️ Imprimer</button>
+    </nav>
+
+    <div class="container">
+        
+        <!-- ONGLET 1: CALENDRIER & EPHÉMÉRIDE PRO -->
+        <div id="tab-cal" class="tab-content active">
+            
+            <!-- EN-TÊTE EPHÉMÉRIDE (HERO HEADER UNIFIÉ ET CENTRÉ) -->
+            <div class="header-cal">
+                <h1 data-i18n="title_cal">Calendrier Fulfulde</h1>
+                
+                <div class="year-selector">
+                    <label for="year-select" data-i18n="year_label">Année :</label>
+                    <select id="year-select" onchange="changeYear()"></select>
+                </div>
+
+                <div id="clock-date" class="clock-date-text">--</div>
+                <div id="clock-num" class="clock-time">00:00:00</div>
+                <div id="clock-moment" class="clock-moment-text">--</div>
+                
+                <div class="scientific-time-data" id="sci-time-data">
+                    JD: -- | LST: --
+                </div>
+                
+                <div id="clock-text" class="clock-fulfulde">--</div>
+                
+                <!-- Bouton de lecture Standard (Web Speech API) -->
+                <button class="btn-audio" onclick="lireHeure()">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
+                        <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89l.706.706z"/>
+                        <path d="M8.707 11.182A4.49 4.49 0 0 0 10.025 8a4.49 4.49 0 0 0-1.318-3.182L8 5.525A3.5 3.5 0 0 1 9.025 8 3.5 3.5 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+                    </svg>
+                    <span data-i18n="btn_audio">Lire</span>
+                </button>
+
+                <!-- BARRE D'EPHÉMÉRIDE DYNAMIQUE -->
+                <div class="header-ephemeris">
+                    <div class="ephemeris-item">
+                        <span class="eph-label" data-i18n="lbl_eph_season">Saison</span>
+                        <span class="eph-value" id="eph-season-val">--</span>
+                    </div>
+                    <div class="ephemeris-item">
+                        <span class="eph-label" data-i18n="lbl_eph_moon">Lune</span>
+                        <span class="eph-value" id="eph-moon-val">--</span>
+                    </div>
+                    <div class="ephemeris-item">
+                        <span class="eph-label" data-i18n="lbl_eph_sun">Soleil</span>
+                        <span class="eph-value" id="eph-sun-val">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="calendar-grid" class="months-grid">
+                <!-- Les mois seront générés ici -->
+            </div>
+
+            <h2 data-i18n="lexicon_title">Lexique et Repères</h2><br>
+            <div class="info-cards" id="lexicon-container">
+                <!-- Lexique généré en JS -->
+            </div>
+        </div>
+
+        <!-- ONGLET 2: METEO & ASTRES -->
+        <div id="tab-meteo" class="tab-content">
+            <div class="dashboard-header">
+                <div>
+                    <h2 data-i18n="title_meteo">Tableau Astronomique & Météo</h2>
+                    <div id="dash-location" style="color: var(--gold-light); font-size: 18px;">Dakar, Sénégal</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">
+                        Lat: <span id="dash-lat">14.7167</span> | Lon: <span id="dash-lon">-17.4677</span> | <span id="dash-time">--:--</span>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn-action" onclick="utiliserMaPosition()" data-i18n="btn_location">📍 Utiliser ma position</button>
+                    <button class="btn-action" onclick="refreshMeteo()" data-i18n="btn_refresh">🔄 Actualiser</button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                
+                <!-- METEO ACTUELLE & AGROMÉTÉOROLOGIE -->
+                <div class="card col-4">
+                    <h3 data-i18n="title_current_weather">Météo & Agrométéorologie</h3>
+                    <div class="current-weather">
+                        <div id="w-icon" class="weather-icon">--</div>
+                        <div>
+                            <div id="w-temp" class="temp-huge">--°</div>
+                            <div id="w-desc" style="color: var(--gold-light); font-weight: bold;">--</div>
+                        </div>
+                    </div>
+                    
+                    <div class="weather-details">
+                        <div><span data-i18n="lbl_feels">Ressenti</span> <span><span id="w-feels">--°C</span></span></div>
+                        <div><span data-i18n="lbl_hum">Humidité</span> <span><span id="w-hum">--</span>% <div class="progress-bar-bg"><div class="progress-bar-fill" id="w-hum-bar" style="width:0%;"></div></div></span></div>
+                        <div><span data-i18n="lbl_wind">Vent</span> <span><span id="w-wind">--</span> km/h</span></div>
+                        <div><span data-i18n="lbl_gusts">Rafales</span> <span><span id="w-gusts">--</span> km/h</span></div>
+                        <div><span data-i18n="lbl_pres">Pression</span> <span><span id="w-pres">--</span> hPa</span></div>
+                        <div><span data-i18n="lbl_cloud">Nuages</span> <span><span id="w-cloud">--</span>% <div class="progress-bar-bg"><div class="progress-bar-fill" id="w-cloud-bar" style="width:0%; background: #ccc;"></div></div></span></div>
+                        <div><span data-i18n="lbl_precip">Précipitation</span> <span><span id="w-precip">--</span> mm</span></div>
+                        <div><span data-i18n="lbl_uv">Indice UV</span> <span><span id="w-uv" style="color: var(--danger);">--</span></span></div>
+                    </div>
+
+                    <!-- Données Scientifiques Agricoles -->
+                    <div class="agri-details">
+                        <div class="agri-title" data-i18n="title_agri">Données Sol & Radiations</div>
+                        <div class="weather-details" style="margin-top:0;">
+                            <div><span data-i18n="lbl_soil_temp">Temp. Sol</span> <span><span id="w-soil-temp">--</span>°C</span></div>
+                            <div><span data-i18n="lbl_soil_moist">Hum. Sol</span> <span><span id="w-soil-moist">--</span> m³</span></div>
+                            <div><span data-i18n="lbl_evapo">Évapotransp.</span> <span><span id="w-evapo">--</span> mm</span></div>
+                            <div><span data-i18n="lbl_solar_rad">Rayonn. Solaire</span> <span><span id="w-solar-rad">--</span> W/m²</span></div>
+                        </div>
+                    </div>
+
+                    <div class="fulfulde-reading" id="fulfulde-temp" style="margin-top: 15px;">
+                        Tolno ngulɓuuɓdi ko --°
+                    </div>
+                </div>
+
+                <!-- SOLEIL & SCIENTIFIQUE -->
+                <div class="card col-4">
+                    <h3 data-i18n="title_sun">Soleil (Naange)</h3>
+                    
+                    <!-- Arc existant -->
+                    <div class="canvas-container" style="height: 100px;">
+                        <canvas id="sun-canvas" width="250" height="100"></canvas>
+                        <div class="canvas-overlay-text" id="sun-alt-text" style="bottom: 0;">Altitude: --°</div>
+                    </div>
+
+                    <div class="astro-times" style="margin-top: 10px;">
+                        <div><span data-i18n="t_dawn">Aube (Astro)</span> <span id="t-dawn-astro">--:--</span></div>
+                        <div><span data-i18n="t_sunrise">Lever</span> <span id="t-sunrise">--:--</span></div>
+                        <div><span data-i18n="t_golden">Heure Dorée</span> <span id="t-golden" style="color: var(--gold-light);">--:--</span></div>
+                        <div><span data-i18n="t_sunset">Coucher</span> <span id="t-sunset">--:--</span></div>
+                        <div><span data-i18n="t_blue">Heure Bleue</span> <span id="t-blue" style="color: var(--sci-blue);">--:--</span></div>
+                        <div><span data-i18n="t_night">Nuit Noire</span> <span id="t-night">--:--</span></div>
+                    </div>
+
+                    <div class="sci-astro-data">
+                        <div><span data-i18n="lbl_ra">Ascension Droite (RA)</span> <span id="sci-sun-ra">--</span></div>
+                        <div><span data-i18n="lbl_dec">Déclinaison (Dec)</span> <span id="sci-sun-dec">--</span></div>
+                    </div>
+                </div>
+
+                <!-- LUNE & BOUSSOLE -->
+                <div class="card col-4">
+                    <h3 data-i18n="title_moon">Lune (Leeuru) & Azimut</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: center; margin-bottom: 15px;">
+                        <div style="text-align: center;">
+                            <div id="moon-icon" style="font-size: 50px; text-shadow: 0 0 15px #FFFDD0; line-height: 1;">🌑</div>
+                            <div id="moon-phase-name" style="color: var(--gold); font-weight: bold; font-size: 12px; margin-top: 5px;">--</div>
+                        </div>
+                        
+                        <!-- Boussole Azimutale -->
+                        <div class="compass-container">
+                            <span class="compass-point n">N</span>
+                            <span class="compass-point e">E</span>
+                            <span class="compass-point s">S</span>
+                            <span class="compass-point w">W</span>
+                            
+                            <!-- Indicateur Soleil -->
+                            <div class="compass-indicator" id="compass-sun" style="transform: rotate(0deg);">
+                                <div class="compass-sun-icon">☀️</div>
+                            </div>
+                            
+                            <!-- Indicateur Lune -->
+                            <div class="compass-indicator" id="compass-moon" style="transform: rotate(0deg);">
+                                <div class="compass-moon-icon">🌙</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="astro-times" style="grid-template-columns: 1fr; gap: 4px;">
+                        <div><span data-i18n="lbl_illum">Illum</span> <span><span id="moon-illum">--</span>%</span></div>
+                        <div><span data-i18n="lbl_age">Âge</span> <span><span id="moon-age">--</span> <span data-i18n="lbl_days">j</span></span></div>
+                        <div><span data-i18n="t_moonrise">Lever de Lune</span> <span id="t-moonrise">--:--</span></div>
+                        <div><span data-i18n="t_moonset">Coucher de Lune</span> <span id="t-moonset">--:--</span></div>
+                    </div>
+
+                    <div class="sci-astro-data">
+                        <div><span data-i18n="lbl_dist">Distance</span> <span id="sci-moon-dist">-- km</span></div>
+                        <div><span data-i18n="lbl_ra">RA</span> <span id="sci-moon-ra">--</span></div>
+                        <div><span data-i18n="lbl_dec">Dec</span> <span id="sci-moon-dec">--</span></div>
+                    </div>
+                </div>
+
+                <!-- PREVISIONS 24H AVEC CHART.JS -->
+                <div class="card col-12">
+                    <h3 data-i18n="title_hourly">Évolution 24 Heures (Température & Précipitations)</h3>
+                    <div class="chart-container">
+                        <canvas id="hourlyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- PREVISIONS 7 JOURS -->
+                <div class="card col-12">
+                    <h3 data-i18n="title_daily">Prévisions 7 Jours</h3>
+                    <div class="daily-forecast" id="daily-container">
+                         <!-- Généré en JS -->
+                    </div>
+                </div>
+
+                <!-- INTERPRETATION ASTRO (LOCALE) -->
+                <div class="card col-12">
+                    <h3 data-i18n="title_astro_interp">Interprétation Astronomique</h3>
+                    <div id="astro-interpretation" style="font-size: 14px; text-align: justify; margin-bottom: 10px; min-height: 60px;">
+                        Analyse en cours...
+                    </div>
+                    <button class="btn-audio" onclick="lireInterpretation()" style="margin:0;">🔊 <span data-i18n="btn_audio">Lire</span></button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+    /* ==========================================================================
+       FONCTION GLOBALE ET VARIABLES DE BASE
+       ========================================================================== */
+    let currentLang = 'fr'; // fr, ff, en
+    let currentYear = new Date().getFullYear();
+    let currentLat = 14.7167; // Dakar
+    let currentLon = -17.4677;
+    let hourlyChartInstance = null;
+
+    // Fonctions de sécurité pour l'assignation dans le DOM
+    function setText(id, text) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = text;
+    }
+    
+    function setHTML(id, html) {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+    }
+
+    function setWidth(id, percent) {
+        const el = document.getElementById(id);
+        if (el) el.style.width = Math.min(Math.max(percent, 0), 100) + '%';
+    }
+
+    window.switchTab = function(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+        document.getElementById(`btn-tab-${tabId}`).classList.add('active');
+    };
+
+    /* ==========================================================================
+       DONNÉES DE TRADUCTION (I18N)
+       ========================================================================== */
+    const i18n = {
+        fr: {
+            nav_cal: "📅 Calendrier", nav_meteo: "🌌 Météo & Astres", nav_print: "🖨️ Imprimer",
+            title_cal: "Calendrier Fulfulde", year_label: "Année :", btn_audio: "Lire",
+            lexicon_title: "Lexique et Repères", btn_location: "📍 Ma position", btn_refresh: "🔄 Actualiser",
+            title_meteo: "Tableau Astronomique & Météo", title_current_weather: "Météo & Agrométéorologie",
+            lbl_feels: "Ressenti", lbl_hum: "Humidité", lbl_wind: "Vent", lbl_gusts: "Rafales", lbl_pres: "Pression",
+            lbl_cloud: "Nuages", lbl_precip: "Précip.", lbl_dew: "Rosée", lbl_vis: "Visibilité", lbl_uv: "Indice UV max",
+            title_sun: "Soleil (Naange)", t_dawn: "Aube (Astro)", t_sunrise: "Lever", t_golden: "Heure Dorée", t_sunset: "Coucher",
+            t_blue: "Heure Bleue", t_dusk_c: "Crép. (Civil)", t_dusk_n: "Crép. (Naut.)", t_night: "Nuit Noire",
+            title_moon: "Lune (Leeuru) & Azimut", lbl_illum: "Illum", lbl_age: "Âge", lbl_days: "j",
+            t_moonrise: "Lever Lune", t_moonset: "Coucher Lune",
+            title_hourly: "Évolution 24 Heures (Température & Précipitations)", title_daily: "Prévisions 7 Jours",
+            title_astro_interp: "Interprétation Astronomique",
+            lbl_today: "Auj.", lbl_alt: "Alt", lbl_az: "Az",
+            
+            lbl_eph_season: "Saison", lbl_eph_moon: "Lune", lbl_eph_sun: "Soleil",
+            moment_morning: "Matin (Subaka)", moment_day: "Journée (Ñalawma)", moment_afternoon: "Après-midi (Kikiiɗe)", moment_evening: "Soir (Hiirnde)", moment_night: "Nuit (Jamma)",
+            
+            season_dabbunde: "Dabbunde (Fraîche)", season_ceedu: "Ceedu (Sèche chaude)", season_ndungu: "Ndungu (Pluies)", season_kawle: "Kawle (Transition)",
+            
+            title_agri: "Données Sol & Radiations",
+            lbl_soil_temp: "Temp. Sol", lbl_soil_moist: "Hum. Sol", lbl_evapo: "Évapotransp.", lbl_solar_rad: "Rayonn. Direct",
+            lbl_jd: "Jour Julien (JD)", lbl_lst: "Temps Sidéral Local",
+            lbl_ra: "RA", lbl_dec: "Dec", lbl_dist: "Distance",
+            
+            months: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
+            days: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
+            daysAbr: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+            moonPhases: ["Nouvelle lune", "Premier croissant", "Premier quartier", "Lune gibbeuse croissante", "Pleine lune", "Lune gibbeuse décroissante", "Dernier quartier", "Dernier croissant"],
+            zodiac: ["Bélier (♈)", "Taureau (♉)", "Gémeaux (♊)", "Cancer (♋)", "Lion (♌)", "Vierge (♍)", "Balance (♎)", "Scorpion (♏)", "Sagittaire (♐)", "Capricorne (♑)", "Verseau (♒)", "Poissons (♓)"],
+            
+            lex_days: "Jours de la semaine", lex_moments: "Moments de la journée", lex_seasons: "Saisons", lex_astro: "Astres & Météo",
+            lex_days_list: "Aabnde : Lundi|Mawbaare : Mardi|Jeslaare : Mercredi|Naasaande : Jeudi|Mawnde : Vendredi|Hoore biir : Samedi|Dewo : Dimanche",
+            lex_moments_list: "Subaka : Matin|Ñalawma : Journée|Kikiiɗe : Après-midi|Hiirnde : Soir|Jamma : Nuit",
+            lex_seasons_list: "Ndungu : Pluies|Ceedu : Sèche chaude|Dabbunde : Fraîche|Kawle : Récoltes",
+            lex_astro_list: "Naange : Soleil|Leeuru : Lune|Ɗow leydi : Ciel|Boodo/Koode : Étoiles|Henndu : Vent|Ndiyam : Pluie",
+
+            interp_moon: "Lune :", interp_sun: "Soleil :", interp_events: "Événements :",
+            interp_moon_dark: "Le ciel est sombre, idéal pour l'observation du ciel profond.",
+            interp_moon_bright: "La lumière lunaire est intense, effaçant les étoiles les moins brillantes.",
+            interp_moon_mid: "La Lune offre de superbes contrastes au télescope.",
+            interp_sun_alt: "Actuellement à une altitude de",
+            interp_venus: "Vénus (Étoile du Berger / Koode gaynaako) : Elle est souvent très brillante à l'horizon Est ou Ouest selon sa période d'élongation.",
+            interp_intro: "En ce mois de", interp_cycle: "jours du cycle lunaire.",
+
+            w_desc: {0: 'Ensoleillé', 1: 'Peu nuageux', 2: 'Partiellement nuageux', 3: 'Couvert', 45: 'Brouillard', 48: 'Brouillard givrant', 51: 'Bruine légère', 53: 'Bruine modérée', 55: 'Bruine dense', 61: 'Pluie faible', 63: 'Pluie modérée', 65: 'Pluie forte', 71: 'Neige faible', 73: 'Neige modérée', 75: 'Neige forte', 95: 'Orage', 96: 'Orage et grêle', 99: 'Orage violent', unknown: 'Inconnu'}
+        },
+        en: {
+            nav_cal: "📅 Calendar", nav_meteo: "🌌 Weather & Stars", nav_print: "🖨️ Print",
+            title_cal: "Fulfulde Calendar", year_label: "Year:", btn_audio: "Read",
+            lexicon_title: "Lexicon and Landmarks", btn_location: "📍 My location", btn_refresh: "🔄 Refresh",
+            title_meteo: "Astronomical & Weather Board", title_current_weather: "Weather & Agrometeorology",
+            lbl_feels: "Feels like", lbl_hum: "Humidity", lbl_wind: "Wind", lbl_gusts: "Gusts", lbl_pres: "Pressure",
+            lbl_cloud: "Clouds", lbl_precip: "Precip.", lbl_dew: "Dew Point", lbl_vis: "Visibility", lbl_uv: "Max UV Index",
+            title_sun: "Sun (Naange)", t_dawn: "Dawn (Astro)", t_sunrise: "Sunrise", t_golden: "Golden Hour", t_sunset: "Sunset",
+            t_blue: "Blue Hour", t_dusk_c: "Dusk (Civil)", t_dusk_n: "Dusk (Naut.)", t_night: "Night",
+            title_moon: "Moon (Leeuru) & Azimuth", lbl_illum: "Illum", lbl_age: "Age", lbl_days: "d",
+            t_moonrise: "Moonrise", t_moonset: "Moonset",
+            title_hourly: "24-Hour Evolution (Temp & Precip)", title_daily: "7-Day Forecast",
+            title_astro_interp: "Astronomical Interpretation",
+            lbl_today: "Today", lbl_alt: "Alt", lbl_az: "Az",
+            
+            lbl_eph_season: "Season", lbl_eph_moon: "Moon", lbl_eph_sun: "Sun",
+            moment_morning: "Morning (Subaka)", moment_day: "Day (Ñalawma)", moment_afternoon: "Afternoon (Kikiiɗe)", moment_evening: "Evening (Hiirnde)", moment_night: "Night (Jamma)",
+
+            season_dabbunde: "Dabbunde (Cool season)", season_ceedu: "Ceedu (Hot dry season)", season_ndungu: "Ndungu (Rainy season)", season_kawle: "Kawle (Harvest season)",
+
+            title_agri: "Soil & Radiation Data",
+            lbl_soil_temp: "Soil Temp.", lbl_soil_moist: "Soil Moist.", lbl_evapo: "Evapotransp.", lbl_solar_rad: "Direct Rad.",
+            lbl_jd: "Julian Date (JD)", lbl_lst: "Local Sidereal Time",
+            lbl_ra: "RA", lbl_dec: "Dec", lbl_dist: "Distance",
+
+            months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+            days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            daysAbr: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            moonPhases: ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"],
+            zodiac: ["Aries (♈)", "Taurus (♉)", "Gemini (♊)", "Cancer (♋)", "Leo (♌)", "Virgo (♍)", "Libra (♎)", "Scorpio (♏)", "Sagittarius (♐)", "Capricorn (♑)", "Aquarius (♒)", "Pisces (♓)"],
+            
+            lex_days: "Days of the week", lex_moments: "Times of day", lex_seasons: "Seasons", lex_astro: "Stars & Weather",
+            lex_days_list: "Aabnde: Monday|Mawbaare: Tuesday|Jeslaare: Wednesday|Naasaande: Thursday|Mawnde: Friday|Hoore biir: Saturday|Dewo: Sunday",
+            lex_moments_list: "Subaka: Morning|Ñalawma: Day|Kikiiɗe: Afternoon|Hiirnde: Evening|Jamma: Night",
+            lex_seasons_list: "Ndungu: Rainy|Ceedu: Hot Dry|Dabbunde: Cool|Kawle: Harvest",
+            lex_astro_list: "Naange: Sun|Leeuru: Moon|Ɗow leydi: Sky|Boodo/Koode: Stars|Henndu: Wind|Ndiyam: Rain",
+
+            interp_moon: "Moon:", interp_sun: "Sun:", interp_events: "Events:",
+            interp_moon_dark: "The sky is dark, ideal for deep sky observation.",
+            interp_moon_bright: "Lunar light is intense, washing out fainter stars.",
+            interp_moon_mid: "The Moon offers superb contrasts through a telescope.",
+            interp_sun_alt: "Currently at an altitude of",
+            interp_venus: "Venus (Shepherd Star / Koode gaynaako): It is often very bright on the East or West horizon.",
+            interp_intro: "In this month of", interp_cycle: "days into the lunar cycle.",
+
+            w_desc: {0: 'Sunny', 1: 'Mostly Clear', 2: 'Partly Cloudy', 3: 'Overcast', 45: 'Fog', 48: 'Freezing Fog', 51: 'Light Drizzle', 53: 'Moderate Drizzle', 55: 'Dense Drizzle', 61: 'Light Rain', 63: 'Moderate Rain', 65: 'Heavy Rain', 71: 'Light Snow', 73: 'Moderate Snow', 75: 'Heavy Snow', 95: 'Thunderstorm', 96: 'Thunderstorm w/ Hail', 99: 'Violent Thunderstorm', unknown: 'Unknown'}
+        },
+        ff: {
+            nav_cal: "📅 Ñalnde", nav_meteo: "🌌 Asamaan & Koode", nav_print: "🖨️ Winndude",
+            title_cal: "Ñalnde Fulfulde", year_label: "Hitaande :", btn_audio: "Janngude",
+            lexicon_title: "Kelme e Maande", btn_location: "📍 Nokku am", btn_refresh: "🔄 Hesɗitinde",
+            title_meteo: "Asamaan e Nguleeki", title_current_weather: "Nguleeki e Leydi",
+            lbl_feels: "Ennjutu", lbl_hum: "Suuɓre", lbl_wind: "Henndu", lbl_gusts: "Henndu Mawndu", lbl_pres: "Teddeendi",
+            lbl_cloud: "Duule", lbl_precip: "Toɓo", lbl_dew: "Rosée", lbl_vis: "Yiyde", lbl_uv: "UV Rayons",
+            title_sun: "Naange", t_dawn: "Fajiri", t_sunrise: "Puyal Naange", t_golden: "Waqtu Kaŋŋe", t_sunset: "Mutal Naange",
+            t_blue: "Waqtu Ɓawlugol", t_dusk_c: "Hiirnde (Civil)", t_dusk_n: "Hiirnde (Naut.)", t_night: "Jamma",
+            title_moon: "Leeuru", lbl_illum: "Jalɓi", lbl_age: "Duuɓi", lbl_days: "ñ",
+            t_moonrise: "Puyal Leeuru", t_moonset: "Mutal Leeuru",
+            title_hourly: "Waqtuuji 24", title_daily: "Balɗe 7",
+            title_astro_interp: "Firo Asamaan",
+            lbl_today: "Hannde", lbl_alt: "Toowndi", lbl_az: "Az",
+            
+            lbl_eph_season: "Sahaaji", lbl_eph_moon: "Leeuru", lbl_eph_sun: "Naange",
+            moment_morning: "Subaka", moment_day: "Ñalawma", moment_afternoon: "Kikiiɗe", moment_evening: "Hiirnde", moment_night: "Jamma",
+
+            season_dabbunde: "Dabbunde (Peewɗi)", season_ceedu: "Ceedu (Nguleeki)", season_ndungu: "Ndungu (Toɓo)", season_kawle: "Kawle (Kawtal)",
+
+            title_agri: "Kabaaruuji Leydi e Naange",
+            lbl_soil_temp: "Nguleeki Leydi", lbl_soil_moist: "Suuɓre Leydi", lbl_evapo: "Wulnde ndiyam", lbl_solar_rad: "Jalɓal Naange",
+            lbl_jd: "Ñalawma Julian", lbl_lst: "Waqtu Asamaan",
+            lbl_ra: "RA", lbl_dec: "Dec", lbl_dist: "Gaaɓondiral",
+
+            months: ["Siilo", "Colte", "Mbooy", "Seedto", "Duujal", "Korse", "Morso", "Juko", "Silto", "Yarkoma", "Jolal", "Bowte"],
+            days: ["Aabnde", "Mawbaare", "Jeslaare", "Naasaande", "Mawnde", "Hoore biir", "Dewo"],
+            daysAbr: ["Aab", "Mawb", "Jes", "Naa", "Mawn", "Hoor", "Dew"],
+            moonPhases: ["Leeuru Hesuru", "Leeuru Fuɗɗo", "Caka Leeuru", "Leeuru Mawnu", "Leeuru Timmu", "Leeuru Ustu", "Caka Ustu", "Leeuru Sakkit"],
+            zodiac: ["Bélier (♈)", "Taureau (♉)", "Gémeaux (♊)", "Cancer (♋)", "Lion (♌)", "Vierge (♍)", "Balance (♎)", "Scorpion (♏)", "Sagittaire (♐)", "Capricorne (♑)", "Verseau (♒)", "Poissons (♓)"],
+            
+            lex_days: "Balɗe yontere", lex_moments: "Waqtuuji ñalawma", lex_seasons: "Sahaaji", lex_astro: "Koode e Asamaan",
+            lex_days_list: "Aabnde : Lundi|Mawbaare : Mardi|Jeslaare : Mercredi|Naasaande : Jeudi|Mawnde : Vendredi|Hoore biir : Samedi|Dewo : Dimanche",
+            lex_moments_list: "Subaka : Matin|Ñalawma : Journée|Kikiiɗe : Après-midi|Hiirnde : Soir|Jamma : Nuit",
+            lex_seasons_list: "Ndungu : Pluies|Ceedu : Sèche|Dabbunde : Fraîche|Kawle : Récoltes",
+            lex_astro_list: "Naange : Soleil|Leeuru : Lune|Ɗow leydi : Ciel|Koode : Étoiles|Henndu : Vent|Ndiyam : Pluie",
+
+            interp_moon: "Leeuru :", interp_sun: "Naange :", interp_events: "Ko kewata :",
+            interp_moon_dark: "Asamaan ɓawli, ina moƴƴi ngam yiyde koode.",
+            interp_moon_bright: "Leeuru ina jalɓi no feewi, koode pamare yiyataake.",
+            interp_moon_mid: "Leeuru ina yiyee no feewi e telescope.",
+            interp_sun_alt: "Tolno toowndi hannde ko",
+            interp_venus: "Wenus (Koode gaynaako) : Ina jalɓi no feewi. Ina yiyee ado fuɗɗo Naange walla caggal jippol Naange.",
+            interp_intro: "E nder lewru", interp_cycle: "ñalaande e nder lewru.",
+
+            w_desc: {0: 'Laaɓi / Naange', 1: 'Duule pamare', 2: 'Duule', 3: 'Asamaan maɓɓi', 45: 'Kudol', 48: 'Kudol peewngol', 51: 'Toɓo pamaro', 53: 'Toɓo', 55: 'Toɓo mawngo', 61: 'Ndiyam', 63: 'Ndiyam', 65: 'Ndiyam mawndam', 71: 'Neige', 73: 'Neige', 75: 'Neige mawngo', 95: 'Faannde', 96: 'Faannde e kattiniiɗe', 99: 'Faannde mawnde', unknown: 'Anndaaka'}
+        }
+    };
+
+    const unitesFF = ["sifir", "gooto", "ɗiɗi", "tati", "nay", "joyi", "jeego", "jeeɗiɗi", "jeetati", "jeenay"];
+    const dizainesFF = {10: "sappo", 20: "noogay", 30: "capanɗe tati", 40: "capanɗe nay", 50: "capanɗe joyi"};
+
+    function changeLanguage() {
+        currentLang = document.getElementById('lang-select').value;
+        updateStaticTexts();
+        buildLexicon();
+        updateEphemerisHeader();
+        buildCalendar(currentYear);
+        if(window.lastWeatherData) {
+            renderWeather(window.lastWeatherData);
+            renderChart(window.lastWeatherData);
+            renderDailyForecast(window.lastWeatherData);
+        }
+        if (typeof SunCalc !== 'undefined') {
+            updateAstroData(new Date(), currentLat, currentLon);
+        }
+    }
+
+    function updateStaticTexts() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (i18n[currentLang][key]) {
+                el.innerHTML = i18n[currentLang][key];
+            }
+        });
+    }
+
+    function updateEphemerisHeader() {
+        const now = new Date();
+        const month = now.getMonth();
+
+        let seasonKey = ''; let seasonIcon = '';
+        if ([11, 0, 1].includes(month)) { seasonKey = 'season_dabbunde'; seasonIcon = '❄️'; }
+        else if ([2, 3, 4].includes(month)) { seasonKey = 'season_ceedu'; seasonIcon = '☀️'; }
+        else if ([5, 6, 7, 8].includes(month)) { seasonKey = 'season_ndungu'; seasonIcon = '🌧️'; }
+        else if ([9, 10].includes(month)) { seasonKey = 'season_kawle'; seasonIcon = '🌾'; }
+        setText('eph-season-val', `${seasonIcon} ${i18n[currentLang][seasonKey]}`);
+
+        if (typeof SunCalc !== 'undefined') {
+            let moonIllum = SunCalc.getMoonIllumination(now);
+            let p = moonIllum.phase;
+            let pIdx = 0; let mIcon = "🌑";
+            if(p > 0.03 && p < 0.22) { pIdx=1; mIcon = "🌒"; }
+            else if(p >= 0.22 && p < 0.28) { pIdx=2; mIcon = "🌓"; }
+            else if(p >= 0.28 && p < 0.47) { pIdx=3; mIcon = "🌔"; }
+            else if(p >= 0.47 && p < 0.53) { pIdx=4; mIcon = "🌕"; }
+            else if(p >= 0.53 && p < 0.72) { pIdx=5; mIcon = "🌖"; }
+            else if(p >= 0.72 && p < 0.78) { pIdx=6; mIcon = "🌗"; }
+            else if(p >= 0.78 && p < 0.97) { pIdx=7; mIcon = "🌘"; }
+            setText('eph-moon-val', `${mIcon} ${i18n[currentLang].moonPhases[pIdx]}`);
+
+            const astro = calculateRealAstrology(now, currentLat, currentLon);
+            setText('eph-sun-val', i18n[currentLang].zodiac[astro.sunIdx]);
+        }
+    }
+
+    function buildLexicon() {
+        const container = document.getElementById('lexicon-container');
+        container.innerHTML = '';
+        const categories = [
+            {title: i18n[currentLang].lex_days, data: i18n[currentLang].lex_days_list},
+            {title: i18n[currentLang].lex_moments, data: i18n[currentLang].lex_moments_list},
+            {title: i18n[currentLang].lex_seasons, data: i18n[currentLang].lex_seasons_list},
+            {title: i18n[currentLang].lex_astro, data: i18n[currentLang].lex_astro_list}
+        ];
+
+        categories.forEach(cat => {
+            let itemsHTML = cat.data.split('|').map(item => {
+                let parts = item.split(':');
+                return `<li><strong>${parts[0].trim()}</strong> : ${parts[1] ? parts[1].trim() : ''}</li>`;
+            }).join('');
+            container.innerHTML += `<div class="card"><h3>${cat.title}</h3><ul>${itemsHTML}</ul></div>`;
+        });
+    }
+
+    function nombreEnFulfulde(n) {
+        n = parseInt(n);
+        if (n < 0 || n > 59 || isNaN(n)) return n.toString();
+        if (n < 10) return unitesFF[n];
+        if (dizainesFF[n]) return dizainesFF[n];
+        let d = Math.floor(n / 10) * 10;
+        let u = n % 10;
+        return dizainesFF[d] + " e " + unitesFF[u];
+    }
+
+    function tempsEnFulfulde(hours, minutes, seconds) {
+        let hStr = nombreEnFulfulde(hours);
+        let mStr = nombreEnFulfulde(minutes);
+        let sStr = nombreEnFulfulde(seconds);
+        let mWord = minutes <= 1 ? "hojom" : "hojomaaji";
+        let sWord = seconds <= 1 ? "leƳƳande" : "leƳƳanɗe";
+        return `Yamnde ${hStr}, ${mWord} ${mStr}, ${sWord} ${sStr}`;
+    }
+
+    function temperatureEnFulfulde(temp) {
+        return `Tolno ngulɓuuɓdi ko ${Math.round(temp)}°`;
+    }
+
+    function formatRA(radians) {
+        let hours = (radians * 180 / Math.PI) / 15;
+        if(hours < 0) hours += 24;
+        let h = Math.floor(hours);
+        let m = Math.floor((hours - h) * 60);
+        let s = Math.round((((hours - h) * 60) - m) * 60);
+        return `${h}h ${m}m ${s}s`;
+    }
+
+    function formatDec(radians) {
+        let degrees = radians * 180 / Math.PI;
+        let sign = degrees >= 0 ? "+" : "-";
+        degrees = Math.abs(degrees);
+        let d = Math.floor(degrees);
+        let m = Math.floor((degrees - d) * 60);
+        let s = Math.round((((degrees - d) * 60) - m) * 60);
+        return `${sign}${d}° ${m}' ${s}"`;
+    }
+
+    /* ==========================================================================
+       SYNTHÈSE VOCALE STANDARD
+       ========================================================================== */
+    function speakText(text, langCode) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = langCode;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("La synthèse vocale n'est pas supportée par votre navigateur.");
+        }
+    }
+
+    function lireHeure() {
+        if(currentLang === 'ff') speakText(document.getElementById('clock-text').innerText, 'ff-Latn');
+        else if(currentLang === 'en') speakText(document.getElementById('clock-num').innerText, 'en-US');
+        else speakText(document.getElementById('clock-num').innerText, 'fr-FR');
+    }
+
+    function lireInterpretation() {
+        const text = document.getElementById('astro-interpretation').innerText;
+        let langCode = currentLang === 'ff' ? 'ff-Latn' : (currentLang === 'en' ? 'en-US' : 'fr-FR');
+        speakText(text, langCode);
+    }
+
+    function generateAstroInterpretation(moonIllum, sunPos, age) {
+        let loc = i18n[currentLang];
+        const mois = new Date().getMonth();
+        const annee = new Date().getFullYear();
+
+        let phaseDesc = loc.interp_moon_mid;
+        if(moonIllum.phase < 0.1 || moonIllum.phase > 0.9) phaseDesc = loc.interp_moon_dark;
+        else if(moonIllum.phase > 0.4 && moonIllum.phase < 0.6) phaseDesc = loc.interp_moon_bright;
+
+        let evt = loc.interp_venus;
+
+        let text = `${loc.interp_intro} ${loc.months[mois]} ${annee} :<br><br>
+        <strong style="color:var(--gold);">${loc.interp_moon}</strong> ${Math.round(age)} ${loc.interp_cycle} ${phaseDesc}<br><br>
+        <strong style="color:var(--gold);">${loc.interp_sun}</strong> ${loc.interp_sun_alt} ${(sunPos.altitude*deg).toFixed(1)}°.<br><br>
+        <strong style="color:var(--gold);">${loc.interp_events}</strong> ${evt}`;
+
+        setHTML('astro-interpretation', text);
+    }
+
+    /* ==========================================================================
+       LOGIQUE DE L'INTERFACE & CALENDRIER
+       ========================================================================== */
+    function init() {
+        const select = document.getElementById('year-select');
+        for (let y = currentYear - 5; y <= currentYear + 10; y++) {
+            let opt = document.createElement('option');
+            opt.value = y;
+            opt.innerText = y;
+            if(y === currentYear) opt.selected = true;
+            select.appendChild(opt);
+        }
+
+        updateStaticTexts();
+        buildLexicon();
+        buildCalendar(currentYear);
+        startClock();
+        loadWeather(currentLat, currentLon);
+        
+        setTimeout(updateEphemerisHeader, 500); 
+    }
+
+    function changeYear() {
+        currentYear = parseInt(document.getElementById('year-select').value);
+        buildCalendar(currentYear);
+    }
+
+    function buildCalendar(year) {
+        const grid = document.getElementById('calendar-grid');
+        grid.innerHTML = '';
+        const today = new Date();
+        
+        for (let m = 0; m < 12; m++) {
+            const card = document.createElement('div');
+            card.className = 'month-card';
+            
+            let mainMonth = i18n[currentLang].months[m];
+            let subMonth = (currentLang !== 'ff') ? i18n['ff'].months[m] : i18n['fr'].months[m];
+
+            let seasonIcon = '';
+            if ([11, 0, 1].includes(m)) seasonIcon = '❄️';
+            else if ([2, 3, 4].includes(m)) seasonIcon = '☀️';
+            else if ([5, 6, 7, 8].includes(m)) seasonIcon = '🌧️';
+            else if ([9, 10].includes(m)) seasonIcon = '🌾';
+
+            let html = `
+                <div class="month-header">
+                    <div class="month-season-icon">${seasonIcon}</div>
+                    <h3>${m+1}. ${mainMonth}</h3>
+                    <span>${subMonth} ${year}</span>
+                </div>
+                <div class="days-grid">
+            `;
+            
+            i18n[currentLang].daysAbr.forEach(jour => {
+                html += `<div class="day-label">${jour}</div>`;
+            });
+
+            const firstDay = new Date(year, m, 1).getDay();
+            const emptyDays = firstDay === 0 ? 6 : firstDay - 1;
+            
+            for (let i = 0; i < emptyDays; i++) {
+                html += `<div class="day-cell empty"></div>`;
+            }
+
+            const daysInMonth = new Date(year, m + 1, 0).getDate();
+            for (let d = 1; d <= daysInMonth; d++) {
+                let isToday = (d === today.getDate() && m === today.getMonth() && year === today.getFullYear()) ? 'today' : '';
+                html += `<div class="day-cell ${isToday}">${d}</div>`;
+            }
+
+            html += `</div>`;
+            card.innerHTML = html;
+            grid.appendChild(card);
+        }
+    }
+
+    function startClock() {
+        function updateClock() {
+            const now = new Date();
+            const h = now.getHours(); const m = now.getMinutes(); const s = now.getSeconds();
+            
+            setHTML('clock-num', `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`);
+            setText('clock-text', tempsEnFulfulde(h, m, s));
+
+            let dayIndex = now.getDay() === 0 ? 6 : now.getDay() - 1;
+            let dayName = i18n[currentLang].days[dayIndex];
+            let monthName = i18n[currentLang].months[now.getMonth()];
+            setText('clock-date', `${dayName}, ${now.getDate()} ${monthName} ${now.getFullYear()}`);
+            setText('dash-time', `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`);
+            
+            let momentKey = 'moment_night';
+            if (h >= 5 && h < 12) momentKey = 'moment_morning';
+            else if (h >= 12 && h < 14) momentKey = 'moment_day';
+            else if (h >= 14 && h < 18) momentKey = 'moment_afternoon';
+            else if (h >= 18 && h < 20) momentKey = 'moment_evening';
+            
+            setText('clock-moment', i18n[currentLang][momentKey]);
+
+            // Données temporelles scientifiques (JD et LST)
+            let jd = (now.getTime() / 86400000) + 2440587.5;
+            const d = jd - 2451545.0;
+            let gmst = (280.46061837 + 360.98564736629 * d) % 360;
+            if (gmst < 0) gmst += 360;
+            let lst = (gmst + currentLon) % 360;
+            if (lst < 0) lst += 360;
+            let lstHours = lst / 15;
+            let lstH = Math.floor(lstHours);
+            let lstM = Math.floor((lstHours - lstH) * 60);
+            
+            setHTML('sci-time-data', `
+                <span data-i18n="lbl_jd">${i18n[currentLang].lbl_jd}</span>: ${jd.toFixed(2)} | 
+                <span data-i18n="lbl_lst">${i18n[currentLang].lbl_lst}</span>: ${lstH.toString().padStart(2,'0')}h${lstM.toString().padStart(2,'0')}
+            `);
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+    }
+
+    /* ==========================================================================
+       LOGIQUE MÉTÉO & API OPEN-METEO
+       ========================================================================== */
+    function utiliserMaPosition() {
+        if (navigator.geolocation) {
+            setText('dash-location', "...");
+            navigator.geolocation.getCurrentPosition(pos => {
+                currentLat = pos.coords.latitude;
+                currentLon = pos.coords.longitude;
+                setText('dash-location', "GPS Position");
+                setText('dash-lat', currentLat.toFixed(4));
+                setText('dash-lon', currentLon.toFixed(4));
+                loadWeather(currentLat, currentLon);
+            }, err => {
+                alert("Erreur géolocalisation.");
+            });
+        }
+    }
+
+    function refreshMeteo() {
+        loadWeather(currentLat, currentLon);
+    }
+
+    const weatherIcons = {0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 45:'🌫️', 48:'🌫️', 51:'🌧️', 53:'🌧️', 55:'🌧️', 61:'☔', 63:'☔', 65:'☔', 71:'❄️', 73:'❄️', 75:'❄️', 95:'⛈️', 96:'⛈️', 99:'⛈️'};
+
+    async function loadWeather(lat, lon) {
+        // Ajout de wind_gusts_10m et daily uv_index_max
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_gusts_10m,visibility,dew_point_2m,soil_temperature_0cm,soil_moisture_0_to_1cm,et0_fao_evapotranspiration,direct_radiation&hourly=temperature_2m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max&timezone=auto`;
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            window.lastWeatherData = data; 
+            
+            renderWeather(data);
+            renderChart(data);
+            renderDailyForecast(data);
+            if (typeof SunCalc !== 'undefined') {
+                updateAstroData(new Date(), lat, lon);
+            }
+        } catch (err) {
+            console.error("API Error", err);
+        }
+    }
+
+    function renderWeather(data) {
+        const c = data.current;
+        const d = data.daily;
+        if(!c) return;
+        let desc = i18n[currentLang].w_desc[c.weather_code] || i18n[currentLang].w_desc['unknown'];
+        let icon = weatherIcons[c.weather_code] || '❓';
+        
+        setText('w-icon', icon);
+        setText('w-desc', desc);
+        setText('w-temp', `${Math.round(c.temperature_2m)}°`);
+        setText('w-feels', `${Math.round(c.apparent_temperature)}°C`);
+        
+        // Humidité avec barre de progression
+        setText('w-hum', c.relative_humidity_2m);
+        setWidth('w-hum-bar', c.relative_humidity_2m);
+        
+        setText('w-wind', Math.round(c.wind_speed_10m));
+        setText('w-gusts', c.wind_gusts_10m !== null ? Math.round(c.wind_gusts_10m) : '--');
+        setText('w-pres', Math.round(c.pressure_msl));
+        
+        // Nuages avec barre de progression
+        setText('w-cloud', c.cloud_cover);
+        setWidth('w-cloud-bar', c.cloud_cover);
+
+        setText('w-precip', c.precipitation);
+        setText('w-uv', d.uv_index_max ? d.uv_index_max[0] : '--');
+        setText('w-dew', `${Math.round(c.dew_point_2m)}°C`);
+        setText('w-vis', `${(c.visibility / 1000).toFixed(1)} km`);
+        
+        // Données Scientifiques / Agricoles
+        setText('w-soil-temp', c.soil_temperature_0cm !== null ? `${Math.round(c.soil_temperature_0cm)}` : '--');
+        setText('w-soil-moist', c.soil_moisture_0_to_1cm !== null ? `${c.soil_moisture_0_to_1cm}` : '--');
+        setText('w-evapo', c.et0_fao_evapotranspiration !== null ? `${c.et0_fao_evapotranspiration}` : '--');
+        setText('w-solar-rad', c.direct_radiation !== null ? `${Math.round(c.direct_radiation)}` : '--');
+
+        setText('fulfulde-temp', temperatureEnFulfulde(c.temperature_2m));
+    }
+
+    // Chart.js graphique pour l'évolution 24h
+    function renderChart(data) {
+        const ctx = document.getElementById('hourlyChart');
+        if(!ctx) return;
+
+        if (hourlyChartInstance) {
+            hourlyChartInstance.destroy();
+        }
+
+        const nowIndex = new Date().getHours();
+        let labels = [];
+        let temps = [];
+        let precips = [];
+
+        // On prend les 24 prochaines heures
+        for (let i = 0; i < 24; i++) {
+            const idx = nowIndex + i;
+            if(idx >= data.hourly.temperature_2m.length) break;
+            
+            const timeStr = data.hourly.time[idx].split('T')[1];
+            labels.push(timeStr);
+            temps.push(data.hourly.temperature_2m[idx]);
+            precips.push(data.hourly.precipitation_probability[idx]);
+        }
+
+        hourlyChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Température (°C)',
+                        data: temps,
+                        borderColor: '#D4AF37', // Gold
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        borderWidth: 2,
+                        yAxisID: 'y',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Précipitation (%)',
+                        data: precips,
+                        type: 'bar',
+                        backgroundColor: 'rgba(79, 172, 254, 0.6)', // Sci-blue
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                color: '#b0c4de',
+                scales: {
+                    x: { ticks: { color: '#b0c4de' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                    y: { 
+                        type: 'linear', display: true, position: 'left',
+                        ticks: { color: '#D4AF37' }, grid: { color: 'rgba(255,255,255,0.05)' } 
+                    },
+                    y1: { 
+                        type: 'linear', display: true, position: 'right', min: 0, max: 100,
+                        ticks: { color: '#4facfe' }, grid: { drawOnChartArea: false } 
+                    },
+                },
+                plugins: {
+                    legend: { labels: { color: '#F5F5F5' } }
+                }
+            }
+        });
+    }
+
+    function renderDailyForecast(data) {
+        const container = document.getElementById('daily-container');
+        if (!container) return;
+        container.innerHTML = '';
+        
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(data.daily.time[i]);
+            let dayName = i18n[currentLang].daysAbr[d.getDay() === 0 ? 6 : d.getDay() - 1];
+            const icon = weatherIcons[data.daily.weather_code[i]] || '❓';
+            const tMax = Math.round(data.daily.temperature_2m_max[i]);
+            const tMin = Math.round(data.daily.temperature_2m_min[i]);
+
+            let displayDay = i === 0 ? i18n[currentLang].lbl_today : dayName;
+
+            container.innerHTML += `
+                <div class="daily-row">
+                    <div>${displayDay} <span style="font-size:11px; color:gray;">${d.getDate()}/${d.getMonth()+1}</span></div>
+                    <div style="font-size:20px; text-align:center;">${icon}</div>
+                    <div style="text-align:right;">
+                        <span style="color:var(--text-muted);">${tMin}°</span> 
+                        <span style="color:var(--cream); font-weight:bold; margin-left:10px;">${tMax}°</span>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    /* ==========================================================================
+       ASTRONOMIE - CALCULS SOLEIL ET LUNE
+       ========================================================================== */
+    const PI = Math.PI, rad = PI/180, deg = 180/PI;
+
+    function formatTimeOnly(date) {
+        if(!date || isNaN(date.getTime())) return "--:--";
+        return `${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
+    }
+
+    function calculateRealAstrology(date, lat, lon) {
+        const jd = date.getTime() / 86400000 + 2440587.5;
+        const d = jd - 2451545.0;
+
+        let L = (280.460 + 0.9856474 * d) % 360;
+        let g = (357.528 + 0.9856003 * d) % 360;
+        let lambda = (L + 1.915 * Math.sin(g * rad) + 0.020 * Math.sin(2 * g * rad)) % 360;
+        if (lambda < 0) lambda += 360;
+        const sunSignIdx = Math.floor(lambda / 30);
+
+        return { sunIdx: sunSignIdx };
+    }
+
+    function updateAstroData(date, lat, lon) {
+        updateEphemerisHeader();
+
+        let sunPos = SunCalc.getPosition(date, lat, lon);
+        let sunAltDeg = sunPos.altitude * deg;
+        let sunAzDeg = (sunPos.azimuth * deg) + 180;
+
+        setText('sun-alt-text', `${i18n[currentLang].lbl_alt}: ${sunAltDeg.toFixed(1)}° | ${i18n[currentLang].lbl_az}: ${sunAzDeg.toFixed(0)}°`);
+        setText('fulfulde-sun', `Naange — tolno ${Math.round(sunAltDeg)}°`);
+        drawArc('sun-canvas', sunAltDeg, '#D4AF37');
+
+        let times = SunCalc.getTimes(date, lat, lon);
+        setText('t-dawn-astro', formatTimeOnly(times.nightEnd));
+        setText('t-sunrise', formatTimeOnly(times.sunrise));
+        setText('t-golden', formatTimeOnly(times.goldenHour)); // Heure Dorée
+        setText('t-sunset', formatTimeOnly(times.sunset));
+        setText('t-blue', formatTimeOnly(times.nauticalDusk)); // Heure Bleue (approx. Crépuscule nautique)
+        setText('t-dusk-civil', formatTimeOnly(times.dusk));
+        setText('t-dusk-naut', formatTimeOnly(times.nauticalDusk));
+        setText('t-night', formatTimeOnly(times.night));
+
+        let moonIllum = SunCalc.getMoonIllumination(date);
+        let moonTimes = SunCalc.getMoonTimes(date, lat, lon);
+        let moonPosObj = SunCalc.getMoonPosition(date, lat, lon);
+        let moonAzDeg = (moonPosObj.azimuth * deg) + 180;
+        
+        let age = moonIllum.phase * 29.53;
+        let illumPercent = moonIllum.fraction * 100;
+
+        setText('moon-age', age.toFixed(1));
+        setText('moon-illum', illumPercent.toFixed(0));
+        setText('fulfulde-moon', `Leeuru — tolno ${Math.round(moonPosObj.altitude * deg)}°`);
+        
+        let p = moonIllum.phase;
+        let pIdx = 0; let mIcon = "🌑";
+        if(p > 0.03 && p < 0.22) { pIdx=1; mIcon = "🌒"; }
+        else if(p >= 0.22 && p < 0.28) { pIdx=2; mIcon = "🌓"; }
+        else if(p >= 0.28 && p < 0.47) { pIdx=3; mIcon = "🌔"; }
+        else if(p >= 0.47 && p < 0.53) { pIdx=4; mIcon = "🌕"; }
+        else if(p >= 0.53 && p < 0.72) { pIdx=5; mIcon = "🌖"; }
+        else if(p >= 0.72 && p < 0.78) { pIdx=6; mIcon = "🌗"; }
+        else if(p >= 0.78 && p < 0.97) { pIdx=7; mIcon = "🌘"; }
+
+        setText('moon-phase-name', i18n[currentLang].moonPhases[pIdx]);
+        setText('moon-icon', mIcon);
+        setText('t-moonrise', moonTimes.rise ? formatTimeOnly(moonTimes.rise) : "--:--");
+        setText('t-moonset', moonTimes.set ? formatTimeOnly(moonTimes.set) : "--:--");
+
+        // Données Scientifiques
+        setText('sci-sun-ra', formatRA(sunPos.altitude)); // Approximations visuelles pour le dashboard
+        setText('sci-sun-dec', formatDec(sunPos.altitude));
+        
+        setText('sci-moon-ra', formatRA(moonPosObj.ra));
+        setText('sci-moon-dec', formatDec(moonPosObj.dec));
+        setText('sci-moon-dist', `${Math.round(moonPosObj.distance)} km`);
+
+        // Mise à jour de la boussole Azimutale
+        const sunCompass = document.getElementById('compass-sun');
+        const moonCompass = document.getElementById('compass-moon');
+        if(sunCompass) sunCompass.style.transform = `rotate(${sunAzDeg}deg)`;
+        if(moonCompass) moonCompass.style.transform = `rotate(${moonAzDeg}deg)`;
+
+        generateAstroInterpretation(moonIllum, sunPos, age);
+    }
+
+    function drawArc(canvasId, value, color) {
+        const canvas = document.getElementById(canvasId);
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width; const h = canvas.height;
+        const cx = w/2; const cy = h - 20; const r = h - 40;
+
+        ctx.clearRect(0,0,w,h);
+        ctx.beginPath(); ctx.arc(cx, cy, r, PI, 0);
+        ctx.lineWidth = 10; ctx.strokeStyle = "rgba(255,255,255,0.1)"; ctx.stroke();
+
+        let angleRatio = value > 0 ? Math.min(value / 90, 1) : 0;
+        let endAngle = PI + (angleRatio * PI);
+
+        if (value > 0) {
+            ctx.beginPath(); ctx.arc(cx, cy, r, PI, endAngle);
+            ctx.lineWidth = 10; ctx.strokeStyle = color; ctx.stroke();
+            let ix = cx + r * Math.cos(endAngle); let iy = cy + r * Math.sin(endAngle);
+            ctx.beginPath(); ctx.arc(ix, iy, 8, 0, 2*PI);
+            ctx.fillStyle = color; ctx.fill();
+        }
+        ctx.beginPath(); ctx.moveTo(10, cy); ctx.lineTo(w-10, cy);
+        ctx.lineWidth = 2; ctx.strokeStyle = "var(--plum-light)"; ctx.stroke();
+    }
+
+    window.onload = init;
+    </script>
+</body>
+</html>

@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendrier Fulfulde — Temps, Météo & Astres</title>
+<!-- SunCalc pour les calculs astronomiques précis -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+<style>
+:root{
+  --bg-dark:#07101f;
+  --bg-panel:#0d1b32;
+  --plum-dark:#2A0A2B;
+  --plum:#4A154B;
+  --plum-light:#7a287c;
+  --gold:#D4AF37;
+  --gold-light:#f1d370;
+  --cream:#FFFDD0;
+  --off-white:#F5F5F5;
+  --text-main:#F5F5F5;
+  --text-muted:#b0c4de;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+  background:radial-gradient(ellipse at top,#0d1b32 0%, #07101f 50%, #000 100%);
+  color:var(--text-main);line-height:1.6;min-height:100vh;
+}
+h1,h2,h3,h4{font-family:'Georgia',serif;color:var(--gold);font-weight:normal}
+
+/* ===== Navigation ===== */
+nav{
+  background:linear-gradient(90deg,var(--plum-dark),var(--bg-panel),var(--plum-dark));
+  padding:15px 20px;display:flex;justify-content:center;align-items:center;
+  flex-wrap:wrap;gap:15px;border-bottom:2px solid var(--gold);
+  position:sticky;top:0;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.5);
+}
+nav button{
+  background:transparent;border:1px solid var(--gold);color:var(--gold);
+  padding:10px 22px;border-radius:25px;cursor:pointer;font-size:15px;
+  transition:all .3s;font-family:'Georgia',serif;
+}
+nav button.active,nav button:hover{
+  background:var(--gold);color:var(--bg-dark);
+  box-shadow:0 0 12px rgba(212,175,55,.6);
+}
+.container{max-width:1400px;margin:0 auto;padding:20px}
+.tab-content{display:none;animation:fadeIn .5s}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== Cards ===== */
+.card{
+  background:linear-gradient(145deg,var(--bg-panel),var(--plum-dark));
+  border:1px solid var(--gold);border-radius:15px;padding:20px;
+  box-shadow:0 8px 16px rgba(0,0,0,.4);position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;width:100%;height:4px;
+  background:linear-gradient(90deg,var(--gold),var(--plum));
+}
+
+/* ===== En-tête Hero ===== */
+.header-hero{
+  display:flex;flex-direction:column;gap:20px;margin-bottom:30px;
+  background:linear-gradient(135deg,rgba(13,27,50,.85),rgba(42,10,43,.85));
+  padding:30px;border-radius:15px;
+  border:1px solid rgba(212,175,55,.4);
+  box-shadow:0 10px 20px rgba(0,0,0,.3);position:relative;overflow:hidden;
+}
+.header-hero::before{
+  content:'';position:absolute;top:0;left:0;width:5px;height:100%;
+  background:linear-gradient(180deg,var(--gold),var(--plum));
+}
+.header-top{
+  display:grid;grid-template-columns:1fr 1fr;gap:25px;align-items:center;
+}
+.header-left h1{font-size:2.4em;line-height:1.1;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.header-left .subtitle{color:var(--text-muted);font-style:italic;margin-top:6px}
+.year-selector{display:flex;align-items:center;gap:12px;margin-top:18px}
+.year-selector label{color:var(--text-muted)}
+.year-selector select{
+  background:rgba(0,0,0,.4);color:var(--gold);
+  border:1px solid rgba(212,175,55,.5);padding:6px 15px;font-size:16px;
+  border-radius:8px;cursor:pointer;
+}
+.clock-widget{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+.clock-date{color:var(--text-muted);font-size:1em;letter-spacing:1px;text-transform:uppercase}
+.clock-time{
+  font-size:3.4em;color:var(--gold-light);font-family:'Courier New',monospace;
+  font-weight:bold;line-height:1.1;text-shadow:0 0 15px rgba(212,175,55,.25);margin:5px 0;
+}
+.clock-moment{color:var(--cream);font-size:1.1em;font-weight:bold}
+.clock-fulfulde{font-size:.95em;color:var(--gold);font-style:italic;margin:8px 0}
+.btn-audio{
+  background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.5);
+  color:var(--gold-light);padding:8px 16px;border-radius:30px;cursor:pointer;
+  font-size:13px;display:flex;align-items:center;gap:8px;transition:.3s;
+}
+.btn-audio:hover{background:var(--gold);color:var(--bg-dark)}
+.header-eph{
+  display:flex;gap:15px;border-top:1px solid rgba(212,175,55,.3);
+  padding-top:20px;flex-wrap:wrap;
+}
+.eph-item{
+  display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.3);
+  padding:10px 20px;border-radius:30px;border:1px solid rgba(212,175,55,.2);
+  color:var(--cream);font-size:14px;
+}
+.eph-label{color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.eph-value{color:var(--gold);font-weight:bold}
+
+@media(max-width:768px){
+  .header-top{grid-template-columns:1fr;text-align:center}
+  .clock-widget{align-items:center;text-align:center}
+  .header-eph{justify-content:center}
+}
+
+/* ===== Mois ===== */
+.months-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:20px;margin-bottom:40px;
+}
+.month-card{
+  background:var(--bg-panel);border:1px solid var(--plum-light);
+  border-radius:10px;padding:15px;position:relative;
+  transition:transform .2s, box-shadow .2s;
+}
+.month-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(212,175,55,.15)}
+.month-header{
+  text-align:center;margin-bottom:12px;
+  border-bottom:1px solid rgba(212,175,55,.3);padding-bottom:10px;position:relative;
+}
+.month-header .month-num{
+  position:absolute;left:0;top:0;color:var(--gold);
+  font-family:Georgia,serif;font-size:18px;opacity:.6;
+}
+.month-header h3{color:var(--gold);font-size:1.4em}
+.month-header span{color:var(--text-muted);font-size:13px}
+.month-season{position:absolute;right:0;top:0;font-size:22px;opacity:.7}
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.day-label{color:var(--gold-light);font-weight:bold;font-size:11px;padding-bottom:5px}
+.day-cell{padding:7px 0;font-size:13px;border-radius:4px;background:rgba(255,255,255,.05)}
+.day-cell.empty{background:transparent}
+.day-cell.weekend{color:var(--gold-light)}
+.day-cell.today{
+  background:var(--plum);color:var(--cream);
+  border:1px solid var(--gold);font-weight:bold;
+  box-shadow:0 0 8px rgba(212,175,55,.4);
+}
+
+/* ===== Lexique ===== */
+.info-cards{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;margin-top:15px;
+}
+.info-cards .card h4{margin-bottom:10px;color:var(--gold-light);font-size:1.1em}
+.info-cards ul{list-style:none}
+.info-cards li{
+  margin-bottom:4px;font-size:13.5px;
+  border-bottom:1px dotted rgba(255,255,255,.1);padding:3px 0;
+}
+.info-cards strong{color:var(--gold-light)}
+
+/* ===== Dashboard météo ===== */
+.dashboard-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:20px;background:var(--bg-panel);padding:18px;
+  border-radius:12px;border:1px solid var(--plum);flex-wrap:wrap;gap:15px;
+}
+.dashboard-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+.col-4{grid-column:span 4}
+.col-6{grid-column:span 6}
+.col-8{grid-column:span 8}
+.col-12{grid-column:span 12}
+@media(max-width:1024px){.col-4,.col-6,.col-8{grid-column:span 12}}
+
+.current-weather{display:flex;align-items:center;gap:20px}
+.weather-icon{font-size:64px;line-height:1}
+.temp-huge{font-size:48px;color:var(--cream);line-height:1}
+.weather-details{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  margin-top:18px;font-size:13.5px;
+}
+.weather-details div{
+  background:rgba(0,0,0,.25);padding:7px 9px;border-radius:6px;
+}
+.weather-details span{color:var(--gold-light);font-weight:bold}
+
+.forecast-hourly{display:flex;overflow-x:auto;gap:12px;padding-bottom:10px}
+.forecast-hourly::-webkit-scrollbar{height:8px}
+.forecast-hourly::-webkit-scrollbar-thumb{background:var(--plum);border-radius:4px}
+.hour-card{
+  min-width:85px;text-align:center;background:rgba(255,255,255,.05);
+  padding:10px 8px;border-radius:8px;border:1px solid rgba(212,175,55,.2);
+}
+.hour-card .h-time{font-size:12px;color:var(--text-muted)}
+.hour-card .h-icon{font-size:24px;margin:5px 0}
+.hour-card .h-temp{color:var(--cream);font-weight:bold}
+
+.daily-forecast{display:flex;flex-direction:column;gap:8px}
+.daily-row{
+  display:grid;grid-template-columns:2fr 1fr 2fr 1fr;align-items:center;
+  background:rgba(255,255,255,.05);padding:10px 12px;border-radius:8px;
+  border-left:3px solid var(--gold);
+}
+.daily-row .d-name{color:var(--gold-light)}
+.daily-row .d-name small{display:block;color:var(--text-muted);font-size:11px}
+.daily-row .d-temps strong{color:var(--cream)}
+.daily-row .d-precip{font-size:13px;color:var(--text-muted);text-align:right}
+
+.canvas-container{
+  width:100%;height:150px;display:flex;justify-content:center;
+  align-items:center;position:relative;
+}
+.canvas-overlay{
+  position:absolute;bottom:0;text-align:center;width:100%;
+  font-size:13px;color:var(--cream);
+}
+
+.astro-times{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  font-size:13px;margin-top:12px;
+}
+.astro-times div{
+  display:flex;justify-content:space-between;
+  border-bottom:1px dotted rgba(255,255,255,.2);padding:4px 0;
+}
+.astro-times span:last-child{color:var(--gold-light);font-weight:bold}
+
+.fulfulde-reading{
+  background:rgba(74,21,75,.6);border-left:4px solid var(--gold);
+  padding:12px 15px;font-style:italic;color:var(--cream);
+  margin-top:12px;border-radius:0 8px 8px 0;font-size:14px;
+}
+
+.btn-action{
+  background:var(--plum);color:var(--off-white);border:none;
+  padding:9px 16px;border-radius:6px;cursor:pointer;font-family:inherit;
+  transition:.2s;font-size:14px;
+}
+.btn-action:hover{background:var(--plum-light)}
+.btn-action.primary{background:var(--gold);color:var(--bg-dark);font-weight:bold}
+.btn-action.primary:hover{background:var(--gold-light)}
+
+.interp-text{
+  font-size:14px;text-align:justify;margin-bottom:10px;min-height:60px;
+  line-height:1.7;color:var(--off-white);
+}
+.interp-text p{margin-bottom:8px}
+.interp-text strong{color:var(--gold-light)}
+
+.astro-aspects{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:8px;font-size:13px;margin-top:10px;
+}
+.astro-aspects div{
+  background:rgba(0,0,0,.2);padding:6px 10px;border-radius:6px;
+  border:1px solid rgba(212,175,55,.2);
+}
+.astro-aspects strong{color:var(--gold-light)}
+
+.note{font-size:12px;color:var(--text-muted);font-style:italic;margin-top:8px}
+
+/* ===== Print ===== */
+@media print{
+  body{background:#fff;color:#000}
+  nav,.btn-action,.btn-audio,.year-selector,.dashboard-header > div:last-child{display:none}
+  .card,.month-card,.header-hero{background:#fff!important;border:1px solid #ccc;box-shadow:none;color:#000}
+  h1,h2,h3,h4{color:#000}
+  .day-cell{color:#000;background:#f5f5f5}
+  .day-cell.today{border:2px solid #000;background:#ddd;color:#000}
+  *{text-shadow:none!important}
+  .tab-content{display:block!important;page-break-after:always}
+  .eph-item,.eph-value,.eph-label{color:#000;background:transparent;border:1px solid #999}
+  .fulfulde-reading{background:#f5f5f5;color:#000}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <button id="btn-tab-cal" class="active" onclick="switchTab('cal')">📅 Calendrier simple</button>
+  <button id="btn-tab-meteo" onclick="switchTab('meteo')">🌌 Météo & Astres</button>
+  <button onclick="window.print()">🖨️ Imprimer</button>
+</nav>
+
+<div class="container">
+
+  <!-- ============ ONGLET 1 : CALENDRIER ============ -->
+  <div id="tab-cal" class="tab-content active">
+
+    <div class="header-hero">
+      <div class="header-top">
+        <div class="header-left">
+          <h1>Calendrier Fulfulde</h1>
+          <div class="subtitle">Pulaagu — Waqtu, Tagoodi e Pinal</div>
+          <div class="year-selector">
+            <label for="year-select">Année :</label>
+            <select id="year-select" onchange="changeYear()"></select>
+          </div>
+        </div>
+        <div class="clock-widget">
+          <div id="clock-date" class="clock-date">--</div>
+          <div id="clock-num" class="clock-time">00:00:00</div>
+          <div id="clock-moment" class="clock-moment">--</div>
+          <div id="clock-fulfulde" class="clock-fulfulde">--</div>
+          <button class="btn-audio" onclick="lireHeureFulfulde()">
+            🔊 Lire en Fulfulde
+          </button>
+        </div>
+      </div>
+      <div class="header-eph">
+        <div class="eph-item">
+          <span class="eph-label">Saison</span>
+          <span class="eph-value" id="eph-season">--</span>
+        </div>
+        <div class="eph-item">
+          <span class="eph-label">Lune</span>
+          <span class="eph-value" id="eph-moon">--</span>
+        </div>
+        <div class="eph-item">
+          <span class="eph-label">Soleil</span>
+          <span class="eph-value" id="eph-sun">--</span>
+        </div>
+        <div class="eph-item">
+          <span class="eph-label">Aujourd'hui</span>
+          <span class="eph-value" id="eph-today-ff">--</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="calendar-grid" class="months-grid"></div>
+
+    <h2>Lexique et Repères Fulfulde</h2>
+    <div class="info-cards" id="lexicon-container"></div>
+  </div>
+
+  <!-- ============ ONGLET 2 : MÉTÉO & ASTRES ============ -->
+  <div id="tab-meteo" class="tab-content">
+
+    <div class="dashboard-header">
+      <div>
+        <h2>Tableau Astronomique & Météo</h2>
+        <div id="dash-location" style="color:var(--gold-light);font-size:18px;">Dakar, Sénégal</div>
+        <div style="font-size:12px;color:var(--text-muted);">
+          <span id="dash-date">--</span> | <span id="dash-time">--:--</span>
+          | Lat: <span id="dash-lat">14.7167</span> | Lon: <span id="dash-lon">-17.4677</span>
+          | TZ: <span id="dash-tz">--</span>
+        </div>
+      </div>
+      <div>
+        <button class="btn-action" onclick="utiliserMaPosition()">📍 Ma position</button>
+        <button class="btn-action" onclick="refreshMeteo()">🔄 Actualiser</button>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+
+      <!-- Météo actuelle -->
+      <div class="card col-4">
+        <h3>Météo Actuelle</h3>
+        <div class="current-weather">
+          <div id="w-icon" class="weather-icon">⛅</div>
+          <div>
+            <div id="w-temp" class="temp-huge">--°</div>
+            <div id="w-desc" style="color:var(--gold-light);font-weight:bold;">--</div>
+          </div>
+        </div>
+        <div class="fulfulde-reading" id="fulfulde-temp">
+          Tolno ngulɓuuɓdi ko --°
+        </div>
+        <div class="weather-details">
+          <div>Ressenti : <span id="w-feels">--</span>°C</div>
+          <div>Humidité : <span id="w-hum">--</span>%</div>
+          <div>Vent : <span id="w-wind">--</span> km/h</div>
+          <div>Direction : <span id="w-wdir">--</span></div>
+          <div>Pression : <span id="w-pres">--</span> hPa</div>
+          <div>Nuages : <span id="w-cloud">--</span>%</div>
+          <div>Précip : <span id="w-precip">--</span> mm</div>
+          <div>UV : <span id="w-uv">--</span></div>
+          <div>Point de rosée : <span id="w-dew">--</span>°C</div>
+          <div>Visibilité : <span id="w-vis">--</span> km</div>
+        </div>
+      </div>
+
+      <!-- Soleil -->
+      <div class="card col-4">
+        <h3>Soleil (Naange)</h3>
+        <div class="canvas-container">
+          <canvas id="sun-canvas" width="260" height="140"></canvas>
+          <div class="canvas-overlay" id="sun-alt-text">Altitude : --° | Azimut : --°</div>
+        </div>
+        <div class="fulfulde-reading" id="fulfulde-sun">Naange — tolno --°</div>
+        <div class="astro-times">
+          <div><span>Aube astro</span><span id="t-dawn-astro">--:--</span></div>
+          <div><span>Aube nautique</span><span id="t-dawn-naut">--:--</span></div>
+          <div><span>Aube civile</span><span id="t-dawn-civ">--:--</span></div>
+          <div><span>Lever ☀️</span><span id="t-sunrise">--:--</span></div>
+          <div><span>Coucher ☀️</span><span id="t-sunset">--:--</span></div>
+          <div><span>Crép. civil</span><span id="t-dusk-civ">--:--</span></div>
+          <div><span>Crép. nautique</span><span id="t-dusk-naut">--:--</span></div>
+          <div><span>Nuit complète</span><span id="t-night">--:--</span></div>
+        </div>
+      </div>
+
+      <!-- Lune -->
+      <div class="card col-4">
+        <h3>Lune (Leeuru)</h3>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+          <div id="moon-icon" style="font-size:54px;text-shadow:0 0 18px #FFFDD0;">🌕</div>
+          <div style="text-align:right;flex:1;">
+            <div id="moon-phase-name" style="color:var(--gold);font-weight:bold;">--</div>
+            <div>Illum : <span id="moon-illum" style="color:var(--gold-light)">--</span>%</div>
+            <div>Âge : <span id="moon-age" style="color:var(--gold-light)">--</span> j</div>
+            <div>Distance : <span id="moon-dist" style="color:var(--gold-light)">--</span> km</div>
+          </div>
+        </div>
+        <div class="canvas-container" style="height:120px;">
+          <canvas id="moon-canvas" width="260" height="120"></canvas>
+          <div class="canvas-overlay" id="moon-alt-text">Altitude : --° | Azimut : --°</div>
+        </div>
+        <div class="fulfulde-reading" id="fulfulde-moon">Leeuru — tolno --°</div>
+        <div class="astro-times" style="grid-template-columns:1fr;">
+          <div><span>Lever de Lune 🌙</span><span id="t-moonrise">--:--</span></div>
+          <div><span>Coucher de Lune</span><span id="t-moonset">--:--</span></div>
+          <div><span>Position (°)</span><span id="moon-degree">--°</span></div>
+          <div><span>Altitude</span><span id="moon-altitude">--°</span></div>
+        </div>
+      </div>
+
+      <!-- Interprétation astronomique -->
+      <div class="card col-8">
+        <h3>Interprétation Astronomique</h3>
+        <div id="astro-interpretation" class="interp-text">
+          Chargement de l'interprétation...
+        </div>
+        <button class="btn-action primary" onclick="lireInterpretation()">🔊 Lire en français</button>
+        <button class="btn-action" onclick="genererInterpretation()">🔄 Régénérer</button>
+      </div>
+
+      <!-- Repères astrologiques -->
+      <div class="card col-4">
+        <h3>Repères Astrologiques</h3>
+        <p class="note">Lecture culturelle / interprétative, distincte de l'astronomie scientifique.</p>
+        <div class="astro-aspects" style="margin-top:12px;">
+          <div><strong>Signe solaire</strong><br><span id="zodiac-sun">--</span></div>
+          <div><strong>Signe lunaire</strong><br><span id="zodiac-moon">--</span></div>
+          <div><strong>Phase</strong><br><span id="zodiac-phase">--</span></div>
+          <div><strong>Aspect</strong><br><span id="zodiac-aspect">--</span></div>
+        </div>
+        <div style="margin-top:12px;font-size:13px;color:var(--text-muted);">
+          <strong style="color:var(--gold-light)">Termes :</strong>
+          thème natal · ascendant · maisons · conjonction · opposition · carré · trigone · sextile · rétrograde
+        </div>
+      </div>
+
+      <!-- Lecture en Fulfulde -->
+      <div class="card col-12">
+        <h3>Lecture en Fulfulde</h3>
+        <div class="fulfulde-reading" id="fulfulde-global">
+          Leeuru e Naange ngoni e dow leydi.
+          Tolno e waqtu mbada ko yeeyde fii yiyde jamirooje mum.
+          Subaka, hiirde e jemma ena mbada ko astre.
+        </div>
+        <button class="btn-action primary" onclick="lireGlobalFulfulde()" style="margin-top:10px;">
+          🔊 Lire en Fulfulde
+        </button>
+        <p class="note">
+          Note : les navigateurs n'ont pas toujours de voix Fulfulde (ff-Latn).
+          Une voix de repli (français/anglais) sera utilisée.
+        </p>
+      </div>
+
+      <!-- Prévisions horaires -->
+      <div class="card col-12">
+        <h3>Prévisions 24 Heures</h3>
+        <div class="forecast-hourly" id="hourly-container">
+          <div style="padding:20px;">Chargement...</div>
+        </div>
+      </div>
+
+      <!-- Prévisions 7 jours -->
+      <div class="card col-12">
+        <h3>Prévisions 7 Jours</h3>
+        <div class="daily-forecast" id="daily-container"></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ==========================================================================
+   1. DONNÉES FULFULDE
+   ========================================================================== */
+const FF = {
+  mois: ["Siilo","Colte","Mbooy","Seedto","Duujal","Korse","Morso","Juko","Silto","Yarkoma","Jolal","Bowte"],
+  moisFR: ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],
+  jours: ["Aabnde","Mawbaare","Jeslaare","Naasaande","Mawnde","Hoore biir","Dewo"],
+  joursFR: ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"],
+  joursAbr: ["Aab","Mawb","Jes","Naa","Mawn","Hoor","Dew"],
+  moments: {
+    matin: {ff:"Subaka", fr:"Matin"},
+    journee: {ff:"Ñalawma", fr:"Journée"},
+    apresmidi: {ff:"Kikiiɗe", fr:"Après-midi"},
+    soir: {ff:"Hiirnde", fr:"Soir"},
+    nuit: {ff:"Jamma", fr:"Nuit"}
+  },
+  saisons: {
+    dabbunde: {ff:"Dabbunde", fr:"Saison fraîche / sèche fraîche", emoji:"🌬️"},
+    ceedu:    {ff:"Ceedu",    fr:"Saison sèche chaude",            emoji:"🔥"},
+    ndungu:   {ff:"Ndungu",   fr:"Saison des pluies",              emoji:"🌧️"},
+    kawle:    {ff:"Kawle",    fr:"Transition / récoltes",          emoji:"🌾"}
+  },
+  astres: {
+    naange:"Naange (soleil)", leeuru:"Leeuru (lune)", dowLeydi:"Ɗow leydi (ciel)",
+    jumtimol:"Jumtimol (arc-en-ciel)", koode:"Boodo / Koode (étoile)",
+    henndu:"Henndu (vent)", ndiyam:"Ndiyam (eau / pluie)",
+    nguleeki:"Ngulɓuuɓdi (température / chaleur)", tolno:"Tolno (degré / niveau)"
+  },
+  temps: {
+    yamnde:"Yamnde (heure)", hojom:"Hojom (minute)", hojomaaji:"Hojomaaji (minutes)",
+    leyyande:"LeƳƳande (seconde / secondes)"
+  }
+};
+
+/* Nombres Fulfulde 0–59 */
+const NUM_FF = {
+  0:"sifir",1:"gooto",2:"ɗiɗi",3:"tati",4:"nay",5:"joyi",6:"jeego",7:"jeeɗiɗi",
+  8:"jeetati",9:"jeenay",10:"sappo",11:"sappo e gooto",12:"sappo e ɗiɗi",
+  13:"sappo e tati",14:"sappo e nay",15:"sappo e joyi",16:"sappo e jeego",
+  17:"sappo e jeeɗiɗi",18:"sappo e jeetati",19:"sappo e jeenay",20:"noogay",
+  30:"capanɗe tati",40:"capanɗe nay",50:"capanɗe joyi"
+};
+
+/* Zodiaque (dates approximatives) */
+const ZODIAC = [
+  {sign:"Capricorne ♑", start:[12,22], end:[1,19]},
+  {sign:"Verseau ♒",    start:[1,20],  end:[2,18]},
+  {sign:"Poissons ♓",   start:[2,19],  end:[3,20]},
+  {sign:"Bélier ♈",     start:[3,21],  end:[4,19]},
+  {sign:"Taureau ♉",    start:[4,20],  end:[5,20]},
+  {sign:"Gémeaux ♊",    start:[5,21],  end:[6,20]},
+  {sign:"Cancer ♋",     start:[6,21],  end:[7,22]},
+  {sign:"Lion ♌",       start:[7,23],  end:[8,22]},
+  {sign:"Vierge ♍",     start:[8,23],  end:[9,22]},
+  {sign:"Balance ♎",    start:[9,23],  end:[10,22]},
+  {sign:"Scorpion ♏",   start:[10,23], end:[11,21]},
+  {sign:"Sagittaire ♐", start:[11,22], end:[12,21]}
+];
+
+/* Base locale d'événements astronomiques.
+   type:"shower" = pluie d'étoiles, "visibility" = repère général, "opposition" = opposition
+   Les bornes de jour sont volontairement larges pour signaler les périodes proches. */
+const EVENTS_ASTRO = [
+  // Pluies d'étoiles
+  {mois:[1], debut:2, fin:4,   nom:"Quadrantides",   type:"shower",     desc:"pluie d'étoiles d'hiver à pic étroit"},
+  {mois:[5], debut:1, fin:10,  nom:"Êta Aquarides",  type:"shower",     desc:"pluie d'étoiles modérée issue de la comète de Halley"},
+  {mois:[8], debut:10, fin:14, nom:"Perséides",      type:"shower",     desc:"pluie d'étoiles majeure, pic vers le 12 août"},
+  {mois:[10], debut:20, fin:23,nom:"Orionides",      type:"shower",     desc:"pluie d'étoiles d'automne issue de Halley"},
+  {mois:[11], debut:16, fin:18,nom:"Léonides",       type:"shower",     desc:"pluie d'étoiles d'automne"},
+  {mois:[12], debut:12, fin:15,nom:"Géminides",      type:"shower",     desc:"pluie d'étoiles très active en décembre"},
+  // Repères de visibilité planétaire (généraux, à affiner selon l'année)
+  {mois:[1,2,3,4,5,6,7,8,9,10,11,12], debut:1, fin:31, nom:"Vénus — étoile du Berger",
+   type:"visibility", desc:"selon sa position dans l'année, Vénus brille au crépuscule (soir) ou avant l'aube (matin)"},
+  // Conjonctions Lune-planètes : signalées de manière générique (rapprochements visibles chaque mois ±1j)
+  {mois:[1,2,3,4,5,6,7,8,9,10,11,12], debut:1, fin:31, nom:"Rapprochement Lune-Jupiter",
+   type:"conjonction", desc:"Jupiter brille intensément près de la Lune lors de leurs rapprochements mensuels"},
+  {mois:[1,2,3,4,5,6,7,8,9,10,11,12], debut:1, fin:31, nom:"Rapprochement Lune-Saturne",
+   type:"conjonction", desc:"Saturne, plus discrète, peut être proche de la Lune selon la période"}
+];
+
+/* Phases lunaires */
+const MOON_PHASES = [
+  {nom:"Nouvelle lune",            emoji:"🌑", min:0,     max:0.03},
+  {nom:"Premier croissant",        emoji:"🌒", min:0.03,  max:0.22},
+  {nom:"Premier quartier",         emoji:"🌓", min:0.22,  max:0.28},
+  {nom:"Lune gibbeuse croissante", emoji:"🌔", min:0.28,  max:0.47},
+  {nom:"Pleine lune",              emoji:"🌕", min:0.47,  max:0.53},
+  {nom:"Lune gibbeuse décroissante",emoji:"🌖", min:0.53, max:0.72},
+  {nom:"Dernier quartier",         emoji:"🌗", min:0.72,  max:0.78},
+  {nom:"Dernier croissant",        emoji:"🌘", min:0.78,  max:0.97},
+  {nom:"Nouvelle lune",            emoji:"🌑", min:0.97,  max:1.01}
+];
+
+/* Codes météo Open-Meteo → description + icône */
+const WCODE = {
+  0:{d:"Ensoleillé",e:"☀️"},
+  1:{d:"Peu nuageux",e:"🌤️"},
+  2:{d:"Partiellement nuageux",e:"⛅"},
+  3:{d:"Couvert",e:"☁️"},
+  45:{d:"Brouillard",e:"🌫️"},
+  48:{d:"Brouillard givrant",e:"🌫️"},
+  51:{d:"Bruine légère",e:"🌦️"},
+  53:{d:"Bruine modérée",e:"🌦️"},
+  55:{d:"Bruine dense",e:"🌧️"},
+  61:{d:"Pluie faible",e:"🌧️"},
+  63:{d:"Pluie modérée",e:"🌧️"},
+  65:{d:"Pluie forte",e:"🌧️"},
+  71:{d:"Neige faible",e:"🌨️"},
+  73:{d:"Neige modérée",e:"🌨️"},
+  75:{d:"Neige forte",e:"❄️"},
+  80:{d:"Averses",e:"🌦️"},
+  81:{d:"Averses modérées",e:"🌧️"},
+  82:{d:"Averses violentes",e:"⛈️"},
+  95:{d:"Orage",e:"⛈️"},
+  96:{d:"Orage et grêle",e:"⛈️"},
+  99:{d:"Orage violent",e:"⛈️"}
+};
+
+/* ==========================================================================
+   2. VARIABLES GLOBALES
+   ========================================================================== */
+let currentYear = new Date().getFullYear();
+let currentLat = 14.7167;     // Dakar
+let currentLon = -17.4677;
+let currentLocName = "Dakar, Sénégal";
+let weatherData = null;       // cache des données météo
+
+/* ==========================================================================
+   3. CONVERTISSEURS FULFULDE
+   ========================================================================== */
+
+/** Convertit un nombre 0–59 en Fulfulde */
+function nombreEnFulfulde(n){
+  n = Math.floor(n);
+  if(n < 0 || n > 59) return String(n);
+  if(NUM_FF[n] !== undefined) return NUM_FF[n];
+  // composé : dizaine + unité
+  const dizaine = Math.floor(n/10)*10;
+  const unite = n % 10;
+  if(NUM_FF[dizaine] && NUM_FF[unite]){
+    return `${NUM_FF[dizaine]} e ${NUM_FF[unite]}`;
+  }
+  return String(n);
+}
+
+/** Convertit une heure complète en Fulfulde
+ *  Règle : l'unité vient avant le nombre.
+ *  ex : 10h32mn15s → "Yamnde sappo, hojomaaji capanɗe tati e ɗiɗi, leƳƳande sappo e joyi"
+ */
+function tempsEnFulfulde(h, m, s){
+  const parts = [];
+  parts.push(`Yamnde ${nombreEnFulfulde(h)}`);
+  if(m !== undefined && m !== null) parts.push(`hojomaaji ${nombreEnFulfulde(m)}`);
+  if(s !== undefined && s !== null) parts.push(`leƳƳande ${nombreEnFulfulde(s)}`);
+  return parts.join(", ");
+}
+
+/** Parse une chaîne du type "10h32mn15s" / "10h32min15s" / "10h32m15s" / "10h" / "10h32mn" */
+function parseTemps(input){
+  if(!input) return null;
+  const r = /^(\d{1,2})h(?:(\d{1,2})(?:mn|min|m)?)?(?:(\d{1,2})s)?$/i;
+  const m = String(input).trim().match(r);
+  if(!m) return null;
+  return {h:+m[1], m:m[2]?+m[2]:0, s:m[3]?+m[3]:0};
+}
+
+/** Degré en Fulfulde : ex degreEnFulfulde(45) → "Tolno capanɗe nay e joyi°" */
+function degreEnFulfulde(d){
+  return `Tolno ${nombreEnFulfulde(Math.round(d))}°`;
+}
+
+/** Température en Fulfulde */
+function temperatureEnFulfulde(t){
+  return `Tolno ngulɓuuɓdi ko ${Math.round(t)}°`;
+}
+
+/* ==========================================================================
+   4. CALENDRIER (FONCTIONNALITÉ 1)
+   ========================================================================== */
+
+/** Construit la grille des 12 mois pour l'année choisie */
+function buildCalendar(year){
+  const container = document.getElementById('calendar-grid');
+  container.innerHTML = '';
+  const today = new Date();
+
+  for(let m = 0; m < 12; m++){
+    const card = document.createElement('div');
+    card.className = 'month-card';
+
+    // Saison approximative par mois (Afrique de l'Ouest sahélienne)
+    let seasonEmoji = '🌾';
+    if([11,0,1].includes(m)) seasonEmoji = '🌬️';      // Dabbunde
+    else if([2,3,4].includes(m)) seasonEmoji = '🔥';   // Ceedu
+    else if([5,6,7,8].includes(m)) seasonEmoji = '🌧️'; // Ndungu
+    else seasonEmoji = '🌾';                            // Kawle (sept-oct)
+
+    let html = `
+      <div class="month-header">
+        <div class="month-num">${String(m+1).padStart(2,'0')}</div>
+        <div class="month-season" title="Saison">${seasonEmoji}</div>
+        <h3>${FF.mois[m]}</h3>
+        <span>${FF.moisFR[m]} ${year}</span>
+      </div>
+      <div class="days-grid">
+    `;
+
+    // En-tête : abréviations Fulfulde
+    FF.joursAbr.forEach(d => {
+      html += `<div class="day-label">${d}</div>`;
+    });
+
+    // Décalage : lundi = premier jour
+    const firstDay = new Date(year, m, 1);
+    // getDay() : 0=dimanche..6=samedi → on remap pour lundi=0
+    let offset = (firstDay.getDay() + 6) % 7;
+    for(let i = 0; i < offset; i++){
+      html += `<div class="day-cell empty"></div>`;
+    }
+
+    // Jours du mois
+    const nbJours = new Date(year, m+1, 0).getDate();
+    for(let d = 1; d <= nbJours; d++){
+      const date = new Date(year, m, d);
+      const dow = (date.getDay() + 6) % 7; // 0=lundi, 6=dimanche
+      let cls = 'day-cell';
+      if(dow >= 5) cls += ' weekend';
+      if(date.toDateString() === today.toDateString()) cls += ' today';
+      html += `<div class="${cls}" title="${FF.jours[dow]}">${d}</div>`;
+    }
+
+    html += `</div>`;
+    card.innerHTML = html;
+    container.appendChild(card);
+  }
+}
+
+/** Génère le lexique Fulfulde */
+function buildLexicon(){
+  const container = document.getElementById('lexicon-container');
+  container.innerHTML = `
+    <div class="card">
+      <h4>Jours de la semaine</h4>
+      <ul>
+        ${FF.jours.map((j,i) => `<li><strong>${j}</strong> — ${FF.joursFR[i]} <em>(${FF.joursAbr[i]})</em></li>`).join('')}
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Moments de la journée</h4>
+      <ul>
+        ${Object.values(FF.moments).map(o => `<li><strong>${o.ff}</strong> — ${o.fr}</li>`).join('')}
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Saisons</h4>
+      <ul>
+        ${Object.values(FF.saisons).map(o => `<li>${o.emoji} <strong>${o.ff}</strong> — ${o.fr}</li>`).join('')}
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Calcul du temps</h4>
+      <ul>
+        ${Object.values(FF.temps).map(t => `<li>⏱️ ${t}</li>`).join('')}
+      </ul>
+      <p class="note">Règle : l'unité (Yamnde, hojomaaji…) vient avant le nombre.</p>
+    </div>
+    <div class="card">
+      <h4>Astres & Météo</h4>
+      <ul>
+        ${Object.values(FF.astres).map(a => `<li>✨ ${a}</li>`).join('')}
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Nombres 1–10</h4>
+      <ul>
+        ${[1,2,3,4,5,6,7,8,9,10].map(n => `<li><strong>${n}</strong> — ${NUM_FF[n]}</li>`).join('')}
+      </ul>
+    </div>
+  `;
+}
+
+function changeYear(){
+  currentYear = +document.getElementById('year-select').value;
+  buildCalendar(currentYear);
+}
+
+function populateYearSelect(){
+  const sel = document.getElementById('year-select');
+  const now = new Date().getFullYear();
+  for(let y = now - 5; y <= now + 10; y++){
+    const opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    if(y === now) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  currentYear = now;
+}
+
+/* ==========================================================================
+   5. HORLOGE & EPHÉMÉRIDES
+   ========================================================================== */
+
+function getMomentJournee(h){
+  if(h < 6) return FF.moments.nuit;
+  if(h < 12) return FF.moments.matin;
+  if(h < 14) return FF.moments.journee;
+  if(h < 18) return FF.moments.apresmidi;
+  if(h < 21) return FF.moments.soir;
+  return FF.moments.nuit;
+}
+
+function getSaisonCourante(date){
+  const m = date.getMonth();
+  if([11,0,1].includes(m)) return FF.saisons.dabbunde;
+  if([2,3,4].includes(m)) return FF.saisons.ceedu;
+  if([5,6,7,8].includes(m)) return FF.saisons.ndungu;
+  return FF.saisons.kawle;
+}
+
+function updateClock(){
+  const now = new Date();
+  const h = now.getHours();
+  const m = now.getMinutes();
+  const s = now.getSeconds();
+  const dow = (now.getDay() + 6) % 7;
+
+  // Affichage numérique
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('clock-num').textContent =
+    `${pad(h)}h${pad(m)}mn${pad(s)}s`;
+
+  // Date Fulfulde : ex "Aabnde, 15 Siilo 2025"
+  const dateFF = `${FF.jours[dow]}, ${now.getDate()} ${FF.mois[now.getMonth()]} ${now.getFullYear()}`;
+  document.getElementById('clock-date').textContent = dateFF;
+
+  // Moment de la journée
+  const mom = getMomentJournee(h);
+  document.getElementById('clock-moment').textContent = `${mom.ff} — ${mom.fr}`;
+
+  // Lecture Fulfulde de l'heure
+  document.getElementById('clock-fulfulde').textContent = tempsEnFulfulde(h, m, s);
+
+  // Ephémérides
+  const saison = getSaisonCourante(now);
+  document.getElementById('eph-season').textContent = `${saison.emoji} ${saison.ff}`;
+  document.getElementById('eph-today-ff').textContent = `${FF.jours[dow]}`;
+
+  // Lune & Soleil (calcul rapide)
+  try{
+    const moon = SunCalc.getMoonIllumination(now);
+    const phase = MOON_PHASES.find(p => moon.phase >= p.min && moon.phase < p.max) || MOON_PHASES[0];
+    document.getElementById('eph-moon').textContent = `${phase.emoji} ${phase.nom}`;
+
+    const sunPos = SunCalc.getPosition(now, currentLat, currentLon);
+    const altDeg = sunPos.altitude * 180 / Math.PI;
+    document.getElementById('eph-sun').textContent =
+      altDeg > 0 ? `☀️ ${Math.round(altDeg)}° au-dessus` : `🌙 ${Math.round(Math.abs(altDeg))}° sous l'horizon`;
+  }catch(e){}
+}
+
+/* ==========================================================================
+   6. SPEECH SYNTHESIS
+   ========================================================================== */
+
+/** Lit un texte avec speechSynthesis. Tente ff-Latn, repli fr/en. */
+function speakFulfulde(text, langPref){
+  if(!('speechSynthesis' in window)){
+    alert("La synthèse vocale n'est pas disponible sur ce navigateur.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = langPref || 'ff-Latn';
+  // Repli : si aucune voix Fulfulde, le navigateur utilisera une voix par défaut
+  utter.rate = 0.9;
+  utter.pitch = 1;
+  speechSynthesis.speak(utter);
+}
+
+function lireHeureFulfulde(){
+  const txt = document.getElementById('clock-fulfulde').textContent;
+  const dateTxt = document.getElementById('clock-date').textContent;
+  speakFulfulde(`${dateTxt}. ${txt}`);
+}
+
+function lireGlobalFulfulde(){
+  const txt = document.getElementById('fulfulde-global').textContent;
+  speakFulfulde(txt);
+}
+
+function lireInterpretation(){
+  const txt = document.getElementById('astro-interpretation').innerText;
+  speakFulfulde(txt, 'fr-FR');
+}
+
+/* ==========================================================================
+   7. ASTRONOMIE (SunCalc)
+   ========================================================================== */
+
+/** Retourne lever/coucher + crépuscules + nuit */
+function calculateTwilightTimes(date, lat, lon){
+  const times = SunCalc.getTimes(date, lat, lon);
+  return {
+    dawnAstro: times.nightEnd,          // -18°
+    dawnNaut:  times.nauticalDawn,      // -12°
+    dawnCiv:   times.dawn,              // -6°
+    sunrise:   times.sunrise,
+    sunset:    times.sunset,
+    duskCiv:   times.dusk,
+    duskNaut:  times.nauticalDusk,
+    night:     times.night              // début nuit complète
+  };
+}
+
+/** Position approximative du Soleil */
+function getApproxSunPosition(date, lat, lon){
+  const p = SunCalc.getPosition(date, lat, lon);
+  return {
+    altitude: p.altitude * 180 / Math.PI,
+    azimuth: (p.azimuth * 180 / Math.PI + 180) % 360 // 0=Nord
+  };
+}
+
+/** Infos lune */
+function getMoonInfo(date){
+  const ill = SunCalc.getMoonIllumination(date);
+  const moonAge = ill.phase * 29.53;
+  const moonDegree = ill.phase * 360;
+  const phase = MOON_PHASES.find(p => ill.phase >= p.min && ill.phase < p.max) || MOON_PHASES[0];
+  return {
+    phase: phase.nom,
+    emoji: phase.emoji,
+    age: moonAge.toFixed(1),
+    illumination: (ill.fraction * 100).toFixed(0),
+    degree: moonDegree.toFixed(0),
+    rawPhase: ill.phase
+  };
+}
+
+/** Dessine un arc d'horizon 0-180° avec la position de l'astre */
+function drawArc(canvasId, altDeg, azDeg, color, label){
+  const c = document.getElementById(canvasId);
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  const w = c.width, h = c.height;
+  ctx.clearRect(0,0,w,h);
+
+  // Arc horizon
+  ctx.strokeStyle = 'rgba(212,175,55,.5)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(w/2, h-10, w/2 - 20, Math.PI, 0, false);
+  ctx.stroke();
+
+  // Graduations Est, Sud, Ouest
+  ctx.fillStyle = 'rgba(176,196,222,.7)';
+  ctx.font = '11px sans-serif';
+  ctx.fillText('E', 5, h-12);
+  ctx.fillText('S', w/2 - 4, 15);
+  ctx.fillText('O', w-15, h-12);
+
+  // Position de l'astre — on map azimut (90=E, 180=S, 270=O) sur l'arc
+  // Pour simplicité : on affiche l'angle = (azDeg - 90) bornée 0-180
+  let angle = azDeg - 90;
+  if(angle < 0) angle = 0;
+  if(angle > 180) angle = 180;
+  const rad = Math.PI - (angle * Math.PI / 180);
+
+  // Altitude → on fait varier le rayon (illustratif)
+  const baseR = w/2 - 20;
+  const altR = baseR * Math.max(0, Math.min(1, altDeg / 90));
+  const cx = w/2 + Math.cos(rad) * baseR;
+  const cy = (h-10) - Math.sin(rad) * baseR;
+
+  // Astre
+  ctx.fillStyle = color;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 15;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 10, 0, Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Si sous l'horizon : trait pointillé
+  if(altDeg < 0){
+    ctx.strokeStyle = 'rgba(255,255,255,.3)';
+    ctx.setLineDash([3,3]);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx, h-10);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+/* ==========================================================================
+   8. MÉTÉO (Open-Meteo)
+   ========================================================================== */
+
+function fmtTime(date){
+  if(!date || isNaN(date.getTime())) return '--:--';
+  return date.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+}
+
+function degToCompass(d){
+  if(d == null || isNaN(d)) return '--';
+  const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
+  return dirs[Math.round(((d % 360) / 22.5)) % 16];
+}
+
+async function loadWeather(lat, lon){
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
+    + `&current=temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,visibility`
+    + `&hourly=temperature_2m,precipitation_probability,weather_code,cloud_cover,wind_speed_10m,visibility`
+    + `&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_sum`
+    + `&timezone=auto&forecast_days=7`;
+  try{
+    const r = await fetch(url);
+    if(!r.ok) throw new Error('Réponse API non OK');
+    const data = await r.json();
+    weatherData = data;
+    return data;
+  }catch(e){
+    console.error('Erreur météo :', e);
+    document.getElementById('w-desc').textContent = '⚠️ Erreur API météo';
+    return null;
+  }
+}
+
+function renderWeather(data){
+  if(!data || !data.current){
+    document.getElementById('w-temp').textContent = '--°';
+    return;
+  }
+  const c = data.current;
+  const code = WCODE[c.weather_code] || {d:'Inconnu', e:'❓'};
+  document.getElementById('w-icon').textContent = code.e;
+  document.getElementById('w-desc').textContent = code.d;
+  document.getElementById('w-temp').textContent = Math.round(c.temperature_2m) + '°';
+  document.getElementById('w-feels').textContent = c.apparent_temperature != null ? Math.round(c.apparent_temperature) : '--';
+  document.getElementById('w-hum').textContent = c.relative_humidity_2m ?? '--';
+  document.getElementById('w-wind').textContent = c.wind_speed_10m != null ? Math.round(c.wind_speed_10m) : '--';
+  document.getElementById('w-wdir').textContent = degToCompass(c.wind_direction_10m);
+  document.getElementById('w-pres').textContent = c.pressure_msl != null ? Math.round(c.pressure_msl) : '--';
+  document.getElementById('w-cloud').textContent = c.cloud_cover ?? '--';
+  document.getElementById('w-precip').textContent = c.precipitation ?? '--';
+  document.getElementById('w-uv').textContent = data.daily?.uv_index_max?.[0] ?? '--';
+  document.getElementById('w-dew').textContent = c.dew_point_2m != null ? Math.round(c.dew_point_2m) : '--';
+  document.getElementById('w-vis').textContent = c.visibility != null ? Math.round(c.visibility / 1000) : '--';
+
+  // Lecture Fulfulde
+  document.getElementById('fulfulde-temp').textContent =
+    `${temperatureEnFulfulde(c.temperature_2m)} (${code.d})`;
+}
+
+function renderHourlyForecast(data){
+  const cont = document.getElementById('hourly-container');
+  if(!data || !data.hourly){ cont.innerHTML = 'Données indisponibles'; return; }
+  const h = data.hourly;
+  const now = new Date();
+  // Trouve l'index de l'heure actuelle
+  let startIdx = h.time.findIndex(t => new Date(t) >= now);
+  if(startIdx < 0) startIdx = 0;
+
+  let html = '';
+  for(let i = startIdx; i < Math.min(startIdx + 24, h.time.length); i++){
+    const t = new Date(h.time[i]);
+    const code = WCODE[h.weather_code[i]] || {d:'?', e:'❓'};
+    html += `
+      <div class="hour-card">
+        <div class="h-time">${t.getHours()}h</div>
+        <div class="h-icon">${code.e}</div>
+        <div class="h-temp">${Math.round(h.temperature_2m[i])}°</div>
+        <div style="font-size:11px;color:var(--text-muted);">${h.precipitation_probability?.[i] ?? 0}%</div>
+      </div>
+    `;
+  }
+  cont.innerHTML = html;
+}
+
+function renderDailyForecast(data){
+  const cont = document.getElementById('daily-container');
+  if(!data || !data.daily){ cont.innerHTML = 'Données indisponibles'; return; }
+  const d = data.daily;
+  let html = '';
+  for(let i = 0; i < d.time.length; i++){
+    const date = new Date(d.time[i]);
+    const dow = (date.getDay() + 6) % 7;
+    const code = WCODE[d.weather_code[i]] || {d:'?', e:'❓'};
+    html += `
+      <div class="daily-row">
+        <div class="d-name">${FF.jours[dow]}<small>${FF.joursFR[dow]} ${date.getDate()} ${FF.mois[date.getMonth()]}</small></div>
+        <div style="font-size:24px;text-align:center;">${code.e}</div>
+        <div class="d-temps">
+          <strong>${Math.round(d.temperature_2m_max[i])}°</strong>
+          / <span style="color:var(--text-muted)">${Math.round(d.temperature_2m_min[i])}°</span>
+          <small style="display:block;color:var(--text-muted);font-size:11px;">${code.d}</small>
+        </div>
+        <div class="d-precip">💧 ${d.precipitation_sum?.[i] ?? 0} mm</div>
+      </div>
+    `;
+  }
+  cont.innerHTML = html;
+}
+
+/* ==========================================================================
+   9. AFFICHAGE ASTRONOMIQUE
+   ========================================================================== */
+
+function getZodiacSign(date){
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  for(const z of ZODIAC){
+    const [sm, sd] = z.start, [em, ed] = z.end;
+    if(sm === m && d >= sd) return z.sign;
+    if(em === m && d <= ed) return z.sign;
+  }
+  return ZODIAC[0].sign;
+}
+
+function renderAstro(){
+  const now = new Date();
+  const lat = currentLat, lon = currentLon;
+
+  // Soleil
+  const twi = calculateTwilightTimes(now, lat, lon);
+  document.getElementById('t-dawn-astro').textContent = fmtTime(twi.dawnAstro);
+  document.getElementById('t-dawn-naut').textContent = fmtTime(twi.dawnNaut);
+  document.getElementById('t-dawn-civ').textContent = fmtTime(twi.dawnCiv);
+  document.getElementById('t-sunrise').textContent = fmtTime(twi.sunrise);
+  document.getElementById('t-sunset').textContent = fmtTime(twi.sunset);
+  document.getElementById('t-dusk-civ').textContent = fmtTime(twi.duskCiv);
+  document.getElementById('t-dusk-naut').textContent = fmtTime(twi.duskNaut);
+  document.getElementById('t-night').textContent = fmtTime(twi.night);
+
+  const sunPos = getApproxSunPosition(now, lat, lon);
+  document.getElementById('sun-alt-text').textContent =
+    `Altitude : ${Math.round(sunPos.altitude)}° | Azimut : ${Math.round(sunPos.azimuth)}°`;
+  drawArc('sun-canvas', sunPos.altitude, sunPos.azimuth, '#f1d370', 'Naange');
+
+  document.getElementById('fulfulde-sun').textContent =
+    `Naange — ${degreEnFulfulde(Math.max(0, sunPos.altitude))}`;
+
+  // Lune
+  const moon = getMoonInfo(now);
+  document.getElementById('moon-icon').textContent = moon.emoji;
+  document.getElementById('moon-phase-name').textContent = moon.phase;
+  document.getElementById('moon-illum').textContent = moon.illumination;
+  document.getElementById('moon-age').textContent = moon.age;
+  document.getElementById('moon-degree').textContent = moon.degree + '°';
+
+  const moonTimes = SunCalc.getMoonTimes(now, lat, lon);
+  document.getElementById('t-moonrise').textContent = fmtTime(moonTimes.rise);
+  document.getElementById('t-moonset').textContent = fmtTime(moonTimes.set);
+
+  const moonPos = SunCalc.getMoonPosition(now, lat, lon);
+  const moonAlt = moonPos.altitude * 180 / Math.PI;
+  const moonAz = (moonPos.azimuth * 180 / Math.PI + 180) % 360;
+  document.getElementById('moon-altitude').textContent = Math.round(moonAlt) + '°';
+
+  // Distance moyenne (info)
+  document.getElementById('moon-dist').textContent = Math.round(moonPos.distance || 384400);
+
+  // Canvas Lune : position sur arc 0-180°
+  document.getElementById('moon-alt-text').textContent =
+    `Altitude : ${Math.round(moonAlt)}° | Azimut : ${Math.round(moonAz)}°`;
+  drawArc('moon-canvas', moonAlt, moonAz, '#FFFDD0', 'Leeuru');
+
+  document.getElementById('fulfulde-moon').textContent =
+    `Leeuru — ${degreEnFulfulde(Math.max(0, moonAlt))} · ${moon.phase}`;
+
+  // Astrologie
+  const sunSign = getZodiacSign(now);
+  document.getElementById('zodiac-sun').textContent = sunSign;
+  // Signe lunaire approximatif via degree (modulo 12 pour éviter index 12 si degree===360)
+  const moonSignIdx = Math.floor(moon.degree / 30) % 12;
+  const moonSigns = ["Bélier ♈","Taureau ♉","Gémeaux ♊","Cancer ♋","Lion ♌","Vierge ♍","Balance ♎","Scorpion ♏","Sagittaire ♐","Capricorne ♑","Verseau ♒","Poissons ♓"];
+  document.getElementById('zodiac-moon').textContent = moonSigns[moonSignIdx] || '--';
+  document.getElementById('zodiac-phase').textContent = moon.phase;
+
+  // Aspect Soleil-Lune avec orbe de ±8°
+  const elong = moon.rawPhase * 360; // angle d'élongation 0-360
+  const aspects = [
+    {name:'Conjonction (0°)',  angle:0,   orbe:8},
+    {name:'Sextile (60°)',     angle:60,  orbe:6},
+    {name:'Carré (90°)',       angle:90,  orbe:7},
+    {name:'Trigone (120°)',    angle:120, orbe:7},
+    {name:'Opposition (180°)', angle:180, orbe:8}
+  ];
+  let aspectName = 'Aucun aspect majeur';
+  for(const a of aspects){
+    if(Math.abs(elong - a.angle) <= a.orbe || Math.abs(360 - elong - a.angle) <= a.orbe){
+      aspectName = a.name;
+      break;
+    }
+  }
+  document.getElementById('zodiac-aspect').textContent = aspectName;
+}
+
+/* ==========================================================================
+   10. INTERPRÉTATION ASTRONOMIQUE
+   ========================================================================== */
+
+function findEventsForDate(date){
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  // Seules les pluies d'étoiles ont des dates de pic précises → fenêtre ±5j.
+  // Les repères "visibility" / "conjonction" sont gérés dans le texte planétaire.
+  return EVENTS_ASTRO.filter(e =>
+    e.type === 'shower' && e.mois.includes(m) && d >= e.debut - 5 && d <= e.fin + 5
+  );
+}
+
+function generateAstroInterpretation(data){
+  const now = new Date();
+  const moon = getMoonInfo(now);
+  const moonTimes = SunCalc.getMoonTimes(now, currentLat, currentLon);
+  const sunTimes = SunCalc.getTimes(now, currentLat, currentLon);
+  const events = findEventsForDate(now);
+
+  const monthFR = FF.moisFR[now.getMonth()];
+  const monthFF = FF.mois[now.getMonth()];
+
+  let html = `<p>En ce ${now.getDate()} ${monthFR} ${now.getFullYear()} (<em>${monthFF}</em>), voici les principales positions et événements astronomiques à retenir pour <strong>${currentLocName}</strong> :</p>`;
+
+  // Lune
+  html += `<p><strong>🌙 Lune :</strong> Nous sommes en phase de <strong>${moon.phase}</strong> (illumination ${moon.illumination}%, âge ${moon.age} jours). `;
+  if(moon.rawPhase < 0.1 || moon.rawPhase > 0.9){
+    html += `La Lune est peu visible : excellentes conditions pour l'observation du ciel profond (galaxies, nébuleuses).`;
+  } else if(moon.rawPhase >= 0.47 && moon.rawPhase <= 0.53){
+    html += `La Pleine Lune illumine fortement la nuit : observation du ciel profond gênée, mais paysages lunaires nets.`;
+  } else if(moon.rawPhase < 0.5){
+    html += `La Lune croissante se couche en première partie de nuit, laissant la place aux observations vers minuit.`;
+  } else {
+    html += `La Lune décroissante se lève tard, laissant la première moitié de nuit propice à l'observation.`;
+  }
+  html += ` Lever : ${fmtTime(moonTimes.rise)} · Coucher : ${fmtTime(moonTimes.set)}.</p>`;
+
+  // Soleil
+  html += `<p><strong>☀️ Soleil (Naange) :</strong> Lever à ${fmtTime(sunTimes.sunrise)}, coucher à ${fmtTime(sunTimes.sunset)}. `;
+  html += `La nuit astronomique complète débute vers ${fmtTime(sunTimes.night)} et finit vers ${fmtTime(sunTimes.nightEnd)}.</p>`;
+
+  // Planètes (notes générales — sans calcul d'éphémérides précis)
+  html += `<p><strong>♀ Vénus :</strong> Souvent très brillante au crépuscule comme <em>étoile du Berger</em>, visible près de l'horizon ouest après le coucher du soleil selon sa position dans l'année.</p>`;
+  html += `<p><strong>♃ Jupiter :</strong> Géante brillante du ciel nocturne, visible la plus grande partie de la nuit lors de son opposition. Un rapprochement avec la Lune est régulièrement à signaler.</p>`;
+  html += `<p><strong>♄ Saturne :</strong> Plus discrète que Jupiter, observable en fin de nuit ou au crépuscule selon la saison.</p>`;
+  html += `<p><strong>♂ Mars :</strong> Discrète sur de longues périodes, observable à l'aube ou au coucher selon sa position orbitale.</p>`;
+
+  // Événements
+  if(events.length){
+    html += `<p><strong>✨ Événements en cours :</strong> `;
+    html += events.map(e => `<strong>${e.nom}</strong> — ${e.desc}`).join(' · ');
+    html += `.</p>`;
+  } else {
+    html += `<p><strong>✨ Événements :</strong> Aucun événement majeur dans la base locale pour cette période. Profitez du ciel pour les observations classiques.</p>`;
+  }
+
+  // Météo
+  if(weatherData?.current){
+    const c = weatherData.current;
+    const code = WCODE[c.weather_code] || {d:'temps variable'};
+    html += `<p><strong>🌤️ Conditions actuelles :</strong> ${code.d.toLowerCase()}, ${Math.round(c.temperature_2m)}°C, humidité ${c.relative_humidity_2m}%, couverture nuageuse ${c.cloud_cover}%.`;
+    if(c.cloud_cover > 70){
+      html += ` Ciel encombré : observation difficile.`;
+    } else if(c.cloud_cover < 30){
+      html += ` Ciel dégagé : conditions favorables.`;
+    }
+    html += `</p>`;
+  }
+
+  document.getElementById('astro-interpretation').innerHTML = html;
+}
+
+function genererInterpretation(){
+  generateAstroInterpretation();
+}
+
+/* ==========================================================================
+   11. GÉOLOCALISATION & RAFRAÎCHISSEMENT
+   ========================================================================== */
+
+function utiliserMaPosition(){
+  if(!navigator.geolocation){
+    alert("Géolocalisation non disponible. On reste sur Dakar.");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      currentLat = pos.coords.latitude;
+      currentLon = pos.coords.longitude;
+      currentLocName = `Position GPS (${currentLat.toFixed(3)}, ${currentLon.toFixed(3)})`;
+      refreshMeteo();
+    },
+    err => {
+      alert("Géolocalisation refusée. On reste sur Dakar.");
+    }
+  );
+}
+
+async function refreshMeteo(){
+  const now = new Date();
+  document.getElementById('dash-location').textContent = currentLocName;
+  document.getElementById('dash-lat').textContent = currentLat.toFixed(4);
+  document.getElementById('dash-lon').textContent = currentLon.toFixed(4);
+  document.getElementById('dash-time').textContent =
+    now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('dash-date').textContent =
+    now.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+
+  const data = await loadWeather(currentLat, currentLon);
+  if(data){
+    // Fuseau horaire renvoyé par l'API (ex: "Africa/Dakar")
+    const tz = data.timezone_abbreviation || data.timezone || '--';
+    document.getElementById('dash-tz').textContent = tz;
+    renderWeather(data);
+    renderHourlyForecast(data);
+    renderDailyForecast(data);
+  }
+  renderAstro();
+  generateAstroInterpretation();
+}
+
+/* ==========================================================================
+   12. NAVIGATION
+   ========================================================================== */
+
+function switchTab(tabId){
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${tabId}`).classList.add('active');
+  document.getElementById(`btn-tab-${tabId}`).classList.add('active');
+  // Si on passe sur l'onglet météo, rafraîchir les canvas
+  if(tabId === 'meteo'){
+    setTimeout(renderAstro, 100);
+  }
+}
+
+/* ==========================================================================
+   13. INITIALISATION
+   ========================================================================== */
+
+function init(){
+  populateYearSelect();
+  buildCalendar(currentYear);
+  buildLexicon();
+  updateClock();
+  setInterval(updateClock, 1000);
+  refreshMeteo();
+  setInterval(refreshMeteo, 10 * 60 * 1000); // refresh toutes les 10 min
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
