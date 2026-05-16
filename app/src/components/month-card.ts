@@ -60,6 +60,24 @@ export function buildCalendar(year: number): void {
   }
 }
 
+/**
+ * On mobile (≤ 640 px viewport), the months-grid becomes a horizontal carousel
+ * with scroll-snap. We auto-scroll to the month containing "today" so the user
+ * lands on the current month and swipes left/right to navigate.
+ */
+export function scrollToCurrentMonthOnMobile(): void {
+  if (typeof window === 'undefined' || window.innerWidth > 640) return;
+  const grid = document.getElementById('calendar-grid');
+  if (!grid) return;
+  const todayCell = grid.querySelector<HTMLElement>('.day-cell.today');
+  const card = todayCell?.closest('.month-card') as HTMLElement | null;
+  if (!card) return;
+  // Wait one paint so the carousel has laid out before scrolling.
+  requestAnimationFrame(() => {
+    card.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' });
+  });
+}
+
 /** Populate the year selector with [current-5..current+10]. */
 export function populateYearSelector(): void {
   const select = document.getElementById('year-select') as HTMLSelectElement | null;

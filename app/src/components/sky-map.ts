@@ -166,6 +166,38 @@ function starAlphaForSky(sunAltDeg: number): number {
   return 0.05;
 }
 
+/**
+ * On small canvases (mobile), aggressively reduce visual density: fewer stars,
+ * only the prominent constellations are labelled. Returns a "compact mode"
+ * flag and a per-axis font scale so the remaining elements stay legible.
+ */
+function getDensityProfile(cssSize: number): {
+  compact: boolean;
+  magBoost: number;       // subtracted from magnitude limit (smaller = stricter)
+  fontScale: number;      // multiplier for label font sizes
+  cardinalFontScale: number;
+  prominentOnly: Set<string>;
+} {
+  const PROMINENT = new Set([
+    'Ori', 'UMa', 'UMi', 'Cas', 'Cyg', 'Sco', 'Sgr', 'Lyr', 'Aql', 'Leo',
+    'Tau', 'Gem', 'Cru', 'Boo', 'Per', 'And', 'Cnc', 'Vir', 'Aqr', 'Psc',
+    'Ari', 'Lib', 'Cap', 'CMa', 'CMi', 'Cen',
+  ]);
+  if (cssSize < 420) {
+    return { compact: true, magBoost: 1.5, fontScale: 1.15, cardinalFontScale: 1.4, prominentOnly: PROMINENT };
+  }
+  if (cssSize < 560) {
+    return { compact: true, magBoost: 0.7, fontScale: 1.05, cardinalFontScale: 1.2, prominentOnly: PROMINENT };
+  }
+  return {
+    compact: false,
+    magBoost: 0,
+    fontScale: 1,
+    cardinalFontScale: 1,
+    prominentOnly: new Set(), // ignored when compact=false
+  };
+}
+
 /** Schedule a one-time data preload on first call. */
 let preloadStarted = false;
 function ensurePreload(): void {
@@ -210,7 +242,10 @@ export function renderSkyMap(): void {
   const sunPosEarly = eqToAlt(date, observer, sunEqEarly.ra, sunEqEarly.dec);
   const sunAltDeg = sunPosEarly.alt;
   const skyTint = computeSkyTint(sunAltDeg);
-  const magLimit = magLimitForSky(sunAltDeg);
+
+  // Adaptive density: drop magnitude limit and font scale based on canvas size.
+  const density = getDensityProfile(cssSize);
+  const magLimit = magLimitForSky(sunAltDeg) - density.magBoost;
   const starAlpha = starAlphaForSky(sunAltDeg);
 
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
@@ -313,7 +348,7 @@ export function renderSkyMap(): void {
     if (alt > 0 && shouldLabelStar(s.mag, alt) && s.name && !skyTint.isDay) {
       ctx.globalAlpha = 1;
       ctx.fillStyle = labelStrong;
-      ctx.font = `500 10px 'JetBrains Mono', monospace`;
+      ctx.font = `500 ${Math.round(10 * density.fontScale)}px 'JetBrains Mono', monospace`;
       ctx.textAlign = 'left';
       ctx.fillText(s.name, p.x + r + 4, p.y - 2);
       ctx.globalAlpha = starAlpha;
@@ -324,14 +359,18 @@ export function renderSkyMap(): void {
   // ---- CONSTELLATION NAME LABELS ----
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
+  const constFontMain = Math.round(12 * density.fontScale);
+  const constFontFaint = Math.round(10 * density.fontScale);
   for (const c of CONSTELLATIONS) {
+    // On small canvas, drop secondary constellations to reduce label clutter.
+    if (density.compact && !density.prominentOnly.has(c.iau)) continue;
     const { alt, az } = eqToAlt(date, observer, c.ra, c.dec);
     const p = project(alt, az, cx, cy, rInner, rOuter);
     if (!p) continue;
     ctx.fillStyle = alt > 0 ? labelMuted : labelDim;
     ctx.font = alt > 0
-      ? `italic 12px 'Cormorant Garamond', serif`
-      : `italic 10px 'Cormorant Garamond', serif`;
+      ? `italic ${constFontMain}px 'Cormorant Garamond', serif`
+      : `italic ${constFontFaint}px 'Cormorant Garamond', serif`;
     ctx.fillText(c.nameFr.toUpperCase(), p.x, p.y);
   }
 
@@ -347,7 +386,8 @@ export function renderSkyMap(): void {
     ctx.fillStyle = '#ffe080';
     ctx.beginPath(); ctx.arc(sunP.x, sunP.y, 7, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = skyTint.isDay ? '#9a7a18' : '#ffd87a';
-    ctx.font = `600 11px 'Inter', sans-serif`;
+    ctx.font = `600 ${Math.round(11 * density.fontScale)}px 'Inter', sans-serif`;
+    ctx.textAlign = 'center';
     ctx.fillText('Soleil', sunP.x, sunP.y - 26);
   }
 
@@ -365,7 +405,8 @@ export function renderSkyMap(): void {
     ctx.fillStyle = '#fffce0';
     ctx.beginPath(); ctx.arc(moonP.x, moonP.y, 5, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = labelStrong;
-    ctx.font = `600 11px 'Inter', sans-serif`;
+    ctx.font = `600 ${Math.round(11 * density.fontScale)}px 'Inter', sans-serif`;
+    ctx.textAlign = 'center';
     ctx.fillText('Lune', moonP.x, moonP.y - 18);
   }
 
@@ -384,14 +425,18 @@ export function renderSkyMap(): void {
     ctx.beginPath(); ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2); ctx.fill();
     if (pos.alt > -5) {
       ctx.fillStyle = labelStrong;
-      ctx.font = `600 10px 'Inter', sans-serif`;
+      ctx.font = `600 ${Math.round(10 * density.fontScale)}px 'Inter', sans-serif`;
+      ctx.textAlign = 'center';
       ctx.fillText(planet.label, p.x, p.y + 16);
     }
   }
 
   // ---- CARDINAL POINTS ----
-  ctx.font = `700 14px 'Cormorant Garamond', serif`;
+  const cardinalFont = Math.round(14 * density.cardinalFontScale);
+  ctx.font = `700 ${cardinalFont}px 'Cormorant Garamond', serif`;
   ctx.fillStyle = cardinal;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
   const cardinals: Array<[string, number]> = [
     ['N', 0], ['E', 90], ['S', 180], ['O', 270],
   ];

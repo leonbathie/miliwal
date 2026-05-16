@@ -292,6 +292,59 @@ nav {
   flex: 1;
 }
 
+/* ===== Hamburger button (hidden on desktop, shown on mobile) ===== */
+.btn-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-full);
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+.btn-hamburger:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+.hamburger-line {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 1.5px;
+  background: var(--text-1);
+  border-radius: 2px;
+  transition: transform var(--t-base), opacity var(--t-fast), top var(--t-base), bottom var(--t-base);
+}
+.hamburger-line:nth-child(1) { top: 11px; }
+.hamburger-line:nth-child(2) { top: 17px; }
+.hamburger-line:nth-child(3) { top: 23px; }
+
+/* "X" animation when open */
+nav.menu-open .btn-hamburger {
+  border-color: var(--accent);
+}
+nav.menu-open .hamburger-line:nth-child(1) {
+  top: 17px;
+  transform: rotate(45deg);
+}
+nav.menu-open .hamburger-line:nth-child(2) { opacity: 0; }
+nav.menu-open .hamburger-line:nth-child(3) {
+  top: 17px;
+  transform: rotate(-45deg);
+}
+
+/* ===== Drawer ===== */
+.nav-drawer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
 /* Theme toggle button */
 .btn-theme {
   display: inline-flex;
@@ -601,6 +654,9 @@ nav button.active {
   gap: var(--s-3);
   margin-bottom: var(--s-9);
 }
+
+/* The "swipe to navigate" hint shows only on mobile */
+.calendar-scroll-hint { display: none; }
 
 .month-card {
   position: relative;
@@ -2100,12 +2156,13 @@ h2[data-i18n="lexicon_title"]::after {
   nav {
     padding: var(--s-2) var(--s-3);
     gap: 6px;
-    justify-content: space-between;
+    flex-wrap: nowrap; /* single row on phone */
+    align-items: center;
   }
-  .nav-brand { gap: 6px; margin-right: 0; }
+  .nav-brand { gap: 6px; margin-right: 0; flex-shrink: 0; }
   .brand-logo { width: 24px; height: 24px; }
   .brand-name { font-size: 0.95rem; }
-  .nav-spacer { display: none; } /* wrap natural */
+  .nav-spacer { display: none; }
   nav button, .lang-select {
     font-size: 12px;
     padding: 6px 10px;
@@ -2113,6 +2170,50 @@ h2[data-i18n="lexicon_title"]::after {
   .btn-theme {
     width: 32px !important;
     height: 32px !important;
+    flex-shrink: 0;
+  }
+
+  /* Show hamburger, hide drawer until opened */
+  .btn-hamburger { display: inline-flex; flex-shrink: 0; }
+
+  .nav-drawer {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: var(--s-3);
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 200px;
+    padding: var(--s-3);
+    margin-top: var(--s-2);
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-2);
+    box-shadow: var(--shadow-md);
+    gap: var(--s-2);
+    z-index: 200;
+    animation: fadeIn 0.18s var(--ease);
+  }
+  nav.menu-open .nav-drawer { display: flex; }
+
+  .nav-drawer > * {
+    width: 100%;
+    text-align: left;
+  }
+  .nav-drawer .lang-select {
+    padding: 10px 28px 10px 14px;
+    font-size: 13px;
+  }
+  .nav-drawer button {
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+
+  /* Make sure tab buttons stay compact */
+  #btn-tab-cal, #btn-tab-meteo {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
   }
 
   /* --- HERO --- */
@@ -2332,13 +2433,54 @@ h2[data-i18n="lexicon_title"]::after {
   }
   .info-cards { gap: var(--s-3); }
 
-  /* --- MONTHS --- */
+  /* --- MONTHS: horizontal scroll, one month at a time, snap to center --- */
   .months-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    overflow-y: hidden;
     gap: var(--s-3);
+    padding: var(--s-3) 0;
+    margin-left: calc(-1 * var(--s-3));
+    margin-right: calc(-1 * var(--s-3));
+    padding-left: var(--s-3);
+    padding-right: var(--s-3);
+    scroll-snap-type: x mandatory;
+    scroll-padding: var(--s-3);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) transparent;
   }
-  .month-card { padding: var(--s-3); }
+  .months-grid::-webkit-scrollbar { height: 4px; }
+  .months-grid::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  .months-grid::-webkit-scrollbar-track { background: transparent; }
+
+  .month-card {
+    flex: 0 0 calc(100% - var(--s-4));
+    max-width: 320px;
+    scroll-snap-align: center;
+    padding: var(--s-3);
+  }
+  .month-card:first-child { margin-left: auto; }
+  .month-card:last-child { margin-right: auto; }
   .month-header h3 { font-size: 1.2rem; }
+
+  /* Visual hint: scroll affordance below the strip */
+  .calendar-scroll-hint {
+    display: block;
+    text-align: center;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: var(--s-2);
+    letter-spacing: 0.04em;
+  }
+  .calendar-scroll-hint::before { content: '‹ '; color: var(--accent); }
+  .calendar-scroll-hint::after { content: ' ›'; color: var(--accent); }
 
   /* --- FOOTER --- */
   .brand-footer { margin-top: var(--s-7); padding-top: var(--s-5); }

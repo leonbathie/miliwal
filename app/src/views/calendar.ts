@@ -1,5 +1,9 @@
 import { state } from '@/state/app-state';
-import { buildCalendar, populateYearSelector } from '@/components/month-card';
+import {
+  buildCalendar,
+  populateYearSelector,
+  scrollToCurrentMonthOnMobile,
+} from '@/components/month-card';
 import { buildLexicon } from '@/components/lexicon';
 import { startClock } from '@/components/clock';
 
@@ -7,6 +11,7 @@ import { startClock } from '@/components/clock';
 export function renderCalendarView(): void {
   populateYearSelector();
   buildCalendar(state.year);
+  scrollToCurrentMonthOnMobile();
   buildLexicon();
   startClock();
 }
@@ -15,4 +20,5 @@ export function renderCalendarView(): void {
 export function changeYear(newYear: number): void {
   state.year = newYear;
   buildCalendar(newYear);
+  scrollToCurrentMonthOnMobile();
 }

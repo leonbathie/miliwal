@@ -24,7 +24,7 @@ import { buildHijriCalendar } from '@/components/hijri-calendar';
 import { renderPlanets } from '@/components/planets-card';
 import { renderConstellations } from '@/components/constellations-card';
 import { renderComputedEclipses } from '@/components/computed-eclipses-card';
-import { buildCalendar as buildGregorianCalendar } from '@/components/month-card';
+import { buildCalendar as buildGregorianCalendar, scrollToCurrentMonthOnMobile } from '@/components/month-card';
 import { renderSkyMap } from '@/components/sky-map';
 import { startTickers } from '@/services/tickers';
 import { updateAstroData } from '@/components/astro-panel';
@@ -38,6 +38,7 @@ let calMode: CalMode = 'gregorian';
 function applyCalendarMode(): void {
   if (calMode === 'hijri') buildHijriCalendar();
   else buildGregorianCalendar(state.year);
+  scrollToCurrentMonthOnMobile();
 }
 
 function setCalMode(mode: CalMode): void {
@@ -123,6 +124,47 @@ function switchTab(tabId: 'cal' | 'meteo'): void {
   if (tabId === 'meteo') {
     requestAnimationFrame(() => renderSkyMap());
   }
+}
+
+/* ============================================================================
+   Hamburger menu (mobile only). The drawer is collapsed by default on
+   narrow viewports and toggled by adding/removing `.menu-open` on <nav>.
+   ============================================================================ */
+function toggleMenu(): void {
+  const nav = document.getElementById('main-nav');
+  if (!nav) return;
+  const wasOpen = nav.classList.toggle('menu-open');
+  document.getElementById('btn-hamburger')?.setAttribute('aria-expanded', String(wasOpen));
+}
+
+function closeMenu(): void {
+  const nav = document.getElementById('main-nav');
+  if (!nav?.classList.contains('menu-open')) return;
+  nav.classList.remove('menu-open');
+  document.getElementById('btn-hamburger')?.setAttribute('aria-expanded', 'false');
+}
+
+/** Bind global handlers that close the menu on outside click / Escape. */
+function bindMenuAutoClose(): void {
+  document.addEventListener('click', (ev) => {
+    const nav = document.getElementById('main-nav');
+    if (!nav?.classList.contains('menu-open')) return;
+    const target = ev.target as HTMLElement | null;
+    if (!target) return;
+    // Click inside the hamburger button: handled by the action delegator above.
+    if (target.closest('[data-action="toggle-menu"]')) return;
+    // Click inside the drawer: close (any drawer action takes effect, then menu closes)
+    if (target.closest('#nav-drawer')) {
+      closeMenu();
+      return;
+    }
+    // Click anywhere else on the page: close
+    closeMenu();
+  });
+
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') closeMenu();
+  });
 }
 
 /* ============================================================================
@@ -220,6 +262,10 @@ function bindActions(): void {
         break;
       case 'install-app':
         void triggerInstall();
+        closeMenu();
+        break;
+      case 'toggle-menu':
+        toggleMenu();
         break;
       case 'set-cal-mode': {
         const mode = actionEl.dataset.mode as CalMode | undefined;
@@ -306,6 +352,7 @@ function startDynamicRefresh(): void {
 function init(): void {
   initTheme();
   bindActions();
+  bindMenuAutoClose();
   setupInstallPrompt();
   updateStaticTexts();
   hydrateIcons();

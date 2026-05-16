@@ -14,24 +14,35 @@
 </head>
 <body>
 
-  <nav>
+  <nav id="main-nav">
     <a href="/" class="nav-brand" aria-label="Pulaagu">
       <span id="brand-logo" class="brand-logo"></span>
       <span class="brand-name">Pulaagu</span>
     </a>
     <div class="nav-spacer"></div>
-    <select id="lang-select" class="lang-select" data-action="change-lang" aria-label="Language">
-      <option value="fr">FR · Français</option>
-      <option value="ff">FF · Fulfulde</option>
-      <option value="en">EN · English</option>
-    </select>
+
+    <!-- Always visible: primary navigation + theme + hamburger -->
     <button id="btn-tab-cal" class="active" data-action="switch-tab" data-tab="cal" data-i18n="nav_cal">Calendrier</button>
     <button id="btn-tab-meteo" data-action="switch-tab" data-tab="meteo" data-i18n="nav_meteo">Météo &amp; Astres</button>
-    <button data-action="print" data-i18n="nav_print">Imprimer</button>
     <button id="btn-theme" class="btn-theme" data-action="toggle-theme" aria-label="Basculer le thème">
       <span id="btn-theme-icon" class="btn-icon"></span>
     </button>
-    <button id="btn-install" class="btn-install hidden" data-action="install-app" data-i18n="install_app">Installer</button>
+    <button id="btn-hamburger" class="btn-hamburger" data-action="toggle-menu" aria-label="Menu" aria-expanded="false" aria-controls="nav-drawer">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+
+    <!-- Collapsible drawer (visible inline on desktop, hidden behind hamburger on mobile) -->
+    <div class="nav-drawer" id="nav-drawer">
+      <select id="lang-select" class="lang-select" data-action="change-lang" aria-label="Language">
+        <option value="fr">FR · Français</option>
+        <option value="ff">FF · Fulfulde</option>
+        <option value="en">EN · English</option>
+      </select>
+      <button data-action="print" data-i18n="nav_print">Imprimer</button>
+      <button id="btn-install" class="btn-install hidden" data-action="install-app" data-i18n="install_app">Installer</button>
+    </div>
   </nav>
 
   <main class="container">
@@ -96,6 +107,7 @@
       </div>
 
       <div id="calendar-grid" class="months-grid"></div>
+      <p class="calendar-scroll-hint">glissez pour naviguer entre les mois</p>
 
       <h2 data-i18n="lexicon_title">Lexique et Repères</h2>
       <div class="info-cards" id="lexicon-container"></div>
