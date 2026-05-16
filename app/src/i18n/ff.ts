@@ -167,6 +167,15 @@ export const ff: Translations = {
 
   live_updated_just_now: 'hesɗitinaama jooni jooni',
   live_updated_ago: 'hesɗitinaama gila',
+
+  gallery_title: 'Jaalle Pulaagu',
+
+  tools_date_plus: 'Ñalawma + balɗe',
+  tools_date_plus_offset: 'Limoore balɗe (± dagaa)',
+  tools_date_plus_result: 'Jaabawol',
+  tools_number_to_ff: 'Limoore e Fulfulde (0–59)',
+  tools_number_to_ff_hint: 'Naɓ limoore hakkunde 0 e 59',
+  tools_number_to_ff_out_of_range: 'Yaltii — ko ko ɓuri 0–59 tan gollotee.',
   visibility_visible: 'yiyetee',
   visibility_below: 'tonkii',
   magnitude_label: 'mag',

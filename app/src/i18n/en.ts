@@ -167,6 +167,15 @@ export const en: Translations = {
 
   live_updated_just_now: 'updated just now',
   live_updated_ago: 'updated',
+
+  gallery_title: 'Pulaagu treasures',
+
+  tools_date_plus: 'Date + N days',
+  tools_date_plus_offset: 'Offset (days, ± allowed)',
+  tools_date_plus_result: 'Result',
+  tools_number_to_ff: 'Number in Fulfulde (0–59)',
+  tools_number_to_ff_hint: 'Enter an integer between 0 and 59',
+  tools_number_to_ff_out_of_range: 'Out of range — only 0–59 supported.',
   visibility_visible: 'visible',
   visibility_below: 'below horizon',
   magnitude_label: 'mag',

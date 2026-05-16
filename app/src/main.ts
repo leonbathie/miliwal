@@ -26,6 +26,7 @@ import {
   openToolsModal,
   refreshToolsLabels,
 } from '@/components/tools-modal';
+import { renderGallery } from '@/components/gallery-card';
 import { initTheme, toggleTheme, getTheme, type Theme } from '@/services/theme';
 import { buildHijriCalendar } from '@/components/hijri-calendar';
 import { renderPlanets } from '@/components/planets-card';
@@ -108,6 +109,7 @@ function applyLanguageEverywhere(): void {
   renderConstellations();
   renderComputedEclipses();
   renderSkyMap();
+  renderGallery();
   refreshToolsLabels();
   rerenderWeatherFromCache();
 }
@@ -393,6 +395,7 @@ function init(): void {
   renderLocationsSelect();
   renderEvents();
   renderComputedEclipses();
+  renderGallery();
 
   void refreshWeather().then(() => {
     renderPrayerCard();

@@ -168,6 +168,15 @@ export const fr: Translations = {
 
   live_updated_just_now: 'mis à jour à l’instant',
   live_updated_ago: 'mis à jour il y a',
+
+  gallery_title: 'Trésors du Pulaagu',
+
+  tools_date_plus: 'Date + N jours',
+  tools_date_plus_offset: 'Décalage (en jours, ± autorisé)',
+  tools_date_plus_result: 'Résultat',
+  tools_number_to_ff: 'Nombre en Fulfulde (0–59)',
+  tools_number_to_ff_hint: 'Entrez un entier entre 0 et 59',
+  tools_number_to_ff_out_of_range: 'Hors plage : seul 0–59 est supporté.',
   visibility_visible: 'visible',
   visibility_below: 'sous l’horizon',
   magnitude_label: 'mag',

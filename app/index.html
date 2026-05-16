@@ -75,6 +75,23 @@
           </div>
           <div id="tools-between-result" class="tool-result"></div>
         </section>
+
+        <section class="tool-section">
+          <h3 data-i18n="tools_date_plus">Date + N jours</h3>
+          <div class="tool-range">
+            <input type="date" id="tools-base-date" class="tool-input" aria-label="Date de base" />
+            <span class="tool-arrow">+</span>
+            <input type="number" id="tools-offset-days" class="tool-input tool-input-num" step="1" placeholder="30" aria-label="Décalage en jours" />
+            <span data-i18n="lbl_days_plural">jours</span>
+          </div>
+          <div id="tools-date-plus-result" class="tool-result"></div>
+        </section>
+
+        <section class="tool-section">
+          <h3 data-i18n="tools_number_to_ff">Nombre en Fulfulde (0–59)</h3>
+          <input type="number" id="tools-num-input" class="tool-input tool-input-num" min="0" max="59" step="1" placeholder="42" aria-label="Nombre 0 à 59" />
+          <div id="tools-num-result" class="tool-result"></div>
+        </section>
       </div>
     </div>
   </div>
@@ -168,6 +185,10 @@
         <span data-illustration="calabash"></span>
         <span data-illustration="peulhat"></span>
       </div>
+
+      <!-- Cultural gallery: photos or illustrations of Pulaagu icons -->
+      <h2 data-i18n="gallery_title">Trésors du Pulaagu</h2>
+      <div class="gallery-list" id="gallery-list"></div>
 
       <h2 data-i18n="lexicon_title">Lexique et Repères</h2>
       <div class="info-cards" id="lexicon-container"></div>

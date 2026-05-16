@@ -171,6 +171,17 @@ export interface Translations {
   // Live indicator
   live_updated_just_now: string;
   live_updated_ago: string;
+
+  // Gallery
+  gallery_title: string;
+
+  // Extra tools (date + N, number → FF)
+  tools_date_plus: string;
+  tools_date_plus_offset: string;
+  tools_date_plus_result: string;
+  tools_number_to_ff: string;
+  tools_number_to_ff_hint: string;
+  tools_number_to_ff_out_of_range: string;
   visibility_visible: string;
   visibility_below: string;
   magnitude_label: string;

@@ -5,6 +5,7 @@ import { toHijri } from '@/services/hijri';
 import { getSeason } from '@/utils/season';
 import { classifyMoonPhase } from '@/utils/moon-phase';
 import { mondayBasedIndex } from '@/utils/date';
+import { nombreEnFulfulde } from '@/utils/fulfulde';
 
 /** Compute day-of-year for any date (1..366). */
 function dayOfYear(d: Date): number {
@@ -156,6 +157,59 @@ function diffDays(a: Date, b: Date): number {
   return Math.round(ms / 86_400_000);
 }
 
+function renderDatePlusN(): void {
+  const baseEl = document.getElementById('tools-base-date') as HTMLInputElement | null;
+  const offsetEl = document.getElementById('tools-offset-days') as HTMLInputElement | null;
+  const resultEl = document.getElementById('tools-date-plus-result');
+  if (!baseEl || !offsetEl || !resultEl) return;
+  if (!baseEl.value || offsetEl.value === '') {
+    resultEl.textContent = '';
+    return;
+  }
+  const offset = parseInt(offsetEl.value, 10);
+  if (isNaN(offset)) {
+    resultEl.textContent = '';
+    return;
+  }
+  const base = new Date(baseEl.value);
+  base.setHours(12, 0, 0, 0); // avoid DST drift
+  const result = new Date(base.getTime() + offset * 86_400_000);
+  const dict = t(state.lang);
+  const formatted = result.toLocaleDateString(
+    state.lang === 'en' ? 'en-US' : 'fr-FR',
+    { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' },
+  );
+  const hijri = toHijri(result, state.lang);
+  resultEl.innerHTML = `
+    <div class="tool-result-big">${formatted}</div>
+    <div class="tool-result-sub">${dict.hijri_label} : ${hijri.formatted}</div>
+  `;
+}
+
+function renderNumberFulfulde(): void {
+  const inputEl = document.getElementById('tools-num-input') as HTMLInputElement | null;
+  const resultEl = document.getElementById('tools-num-result');
+  if (!inputEl || !resultEl) return;
+  if (inputEl.value === '') {
+    resultEl.textContent = '';
+    return;
+  }
+  const n = parseInt(inputEl.value, 10);
+  const dict = t(state.lang);
+  if (isNaN(n)) {
+    resultEl.textContent = '';
+    return;
+  }
+  if (n < 0 || n > 59) {
+    resultEl.innerHTML = `<div class="tool-result-sub">${dict.tools_number_to_ff_out_of_range}</div>`;
+    return;
+  }
+  resultEl.innerHTML = `
+    <div class="tool-result-big">${nombreEnFulfulde(n)}</div>
+    <div class="tool-result-sub">${n} → Fulfulde</div>
+  `;
+}
+
 function renderBetween(): void {
   const fromEl = document.getElementById('tools-from-date') as HTMLInputElement | null;
   const toEl = document.getElementById('tools-to-date') as HTMLInputElement | null;
@@ -225,6 +279,18 @@ export function renderToolsContents(): void {
     toInput.value = isoYMD(eoy);
   }
   renderBetween();
+
+  // Date + N days — pre-seed with today + 30
+  const baseInput = document.getElementById('tools-base-date') as HTMLInputElement | null;
+  const offsetInput = document.getElementById('tools-offset-days') as HTMLInputElement | null;
+  if (baseInput && !baseInput.value) baseInput.value = isoYMD(today);
+  if (offsetInput && offsetInput.value === '') offsetInput.value = '30';
+  renderDatePlusN();
+
+  // Number → Fulfulde — pre-seed with 42
+  const numInput = document.getElementById('tools-num-input') as HTMLInputElement | null;
+  if (numInput && numInput.value === '') numInput.value = '42';
+  renderNumberFulfulde();
 }
 
 /** Bind change listeners once. Idempotent. */
@@ -240,6 +306,11 @@ export function bindToolsModal(): void {
 
   document.getElementById('tools-from-date')?.addEventListener('change', renderBetween);
   document.getElementById('tools-to-date')?.addEventListener('change', renderBetween);
+
+  document.getElementById('tools-base-date')?.addEventListener('change', renderDatePlusN);
+  document.getElementById('tools-offset-days')?.addEventListener('input', renderDatePlusN);
+
+  document.getElementById('tools-num-input')?.addEventListener('input', renderNumberFulfulde);
 
   // Escape key closes the modal
   document.addEventListener('keydown', (e) => {
