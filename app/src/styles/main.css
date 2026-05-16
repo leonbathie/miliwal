@@ -184,6 +184,24 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Prevent grid/flex items with long content from blowing out their columns */
+*, *::before, *::after { min-width: 0; }
+
+/* Media elements never overflow their container */
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Long words / URLs break instead of forcing horizontal scroll */
+p, blockquote, li, dd, .fulfulde-reading, .proverb-quote, .proverb-translation,
+.event-title, .event-desc, .eclipse-title, .planet-name, .planet-sub,
+.constellation-name, .constellation-sub {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
+
 html { scroll-behavior: smooth; }
 
 body {
@@ -2061,6 +2079,23 @@ h2[data-i18n="lexicon_title"]::after {
 @media (max-width: 640px) {
   .container { padding: var(--s-5) var(--s-3) var(--s-7); }
 
+  /* Touch targets — Apple HIG / Material Design recommend 44px min */
+  nav button,
+  .lang-select,
+  .btn-action,
+  .btn-audio,
+  .cal-mode-btn,
+  .locations-select,
+  .year-selector select {
+    min-height: 36px;
+  }
+  /* Primary action buttons get full 44px target on mobile */
+  .dashboard-actions .btn-action,
+  #btn-install,
+  .card-actions .btn-action {
+    min-height: 44px;
+  }
+
   /* --- NAVIGATION --- */
   nav {
     padding: var(--s-2) var(--s-3);
@@ -2141,6 +2176,29 @@ h2[data-i18n="lexicon_title"]::after {
   .locations-select { width: 100%; }
   #dash-location { font-size: 0.95rem; }
   .dashboard-header h2 { font-size: 1.25rem; }
+
+  /* Coords line wraps on small screens */
+  .dash-coords {
+    line-height: 1.6;
+  }
+  .dash-coords > span {
+    display: inline-block;
+    margin-right: var(--s-2);
+  }
+
+  /* --- SKY MAP --- */
+  .sky-map-container { padding: 0; }
+  #sky-map {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* --- CHART CONTAINERS --- */
+  .chart-container {
+    height: 220px !important;
+    margin-left: calc(-1 * var(--s-2));
+    margin-right: calc(-1 * var(--s-2));
+  }
 
   /* --- CARDS --- */
   .card { padding: var(--s-4) var(--s-3); border-radius: var(--r-2); }
