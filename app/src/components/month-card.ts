@@ -1,6 +1,7 @@
 import { state } from '@/state/app-state';
 import { t, i18n } from '@/i18n';
 import { getSeason } from '@/utils/season';
+import { illustration } from '@/components/illustrations';
 
 /** Build the calendar grid (12 month cards) for a given year. */
 export function buildCalendar(year: number): void {
@@ -23,9 +24,11 @@ export function buildCalendar(year: number): void {
 
     const season = getSeason(m);
 
+    const seasonSvg = illustration(season.illustration, { width: 28, height: 28, className: 'month-season-illu' });
+
     let html = `
       <div class="month-header">
-        <div class="month-season-icon">${season.icon}</div>
+        <div class="month-season-icon">${seasonSvg}</div>
         <h3>${m + 1}. ${mainMonth}</h3>
         <span>${subMonth} ${year}</span>
       </div>

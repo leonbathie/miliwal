@@ -19,6 +19,7 @@ import { renderEvents } from '@/components/events-card';
 import { renderLocationsSelect, findLocationById } from '@/components/locations-select';
 import { icon, type IconName } from '@/components/icons';
 import { mountLogo, logoSvg } from '@/components/logo';
+import { hydrateIllustrations } from '@/components/illustrations';
 import { initTheme, toggleTheme, getTheme, type Theme } from '@/services/theme';
 import { buildHijriCalendar } from '@/components/hijri-calendar';
 import { renderPlanets } from '@/components/planets-card';
@@ -356,6 +357,7 @@ function init(): void {
   setupInstallPrompt();
   updateStaticTexts();
   hydrateIcons();
+  hydrateIllustrations();
   refreshThemeButton();
   mountLogo('brand-logo', 28);
   const footerLogo = document.querySelector('.brand-footer-logo');

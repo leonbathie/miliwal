@@ -1446,6 +1446,120 @@ h2[data-i18n="lexicon_title"]::after {
 }
 
 /* ============================================================================
+   Cultural Pulaagu illustrations
+   ============================================================================ */
+
+/* Hero pastoral scene watermark (zebu + acacia + sun) */
+.hero-pastoral {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 520px;
+  height: auto;
+  opacity: 0.06;
+  color: var(--accent-warm);
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-pastoral svg { width: 100%; height: auto; }
+
+:root[data-theme="light"] .hero-pastoral { opacity: 0.1; }
+
+/* Make sure all hero contents stay above the watermark */
+.header-cal > *:not(.hero-pastoral) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Cultural frieze between sections — small repeating silhouettes */
+.cultural-frieze {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: var(--s-3);
+  padding: var(--s-4) 0;
+  margin: var(--s-6) 0 var(--s-5);
+  color: var(--accent-warm);
+  opacity: 0.45;
+  border-top: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
+  position: relative;
+}
+
+.cultural-frieze::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 22px,
+      currentColor 22px 23px,
+      transparent 23px 46px
+    );
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.cultural-frieze > span {
+  display: inline-flex;
+  align-items: flex-end;
+  height: 40px;
+}
+
+.cultural-frieze > span:nth-child(odd) { transform: translateY(-2px); }
+.cultural-frieze > span:nth-child(even) { transform: translateY(2px); }
+
+.cultural-frieze svg {
+  width: auto;
+  height: 38px;
+  max-width: 60px;
+}
+
+@media (max-width: 640px) {
+  .cultural-frieze { gap: var(--s-2); padding: var(--s-3) 0; }
+  .cultural-frieze svg { height: 28px; }
+  /* Hide some elements on narrow screens for cleaner rhythm */
+  .cultural-frieze > span:nth-child(5),
+  .cultural-frieze > span:nth-child(6),
+  .cultural-frieze > span:nth-child(7) { display: none; }
+}
+
+/* Cultural season illustration inside month-card */
+.month-season-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.month-season-illu {
+  color: var(--accent-warm);
+  opacity: 0.7;
+  transition: opacity var(--t-fast);
+}
+
+.month-card:hover .month-season-illu {
+  opacity: 1;
+}
+
+/* Optional repeating textile pattern band — used as decorative section break */
+.textile-band {
+  height: 24px;
+  background-image:
+    linear-gradient(135deg, var(--accent) 25%, transparent 25%),
+    linear-gradient(225deg, var(--accent) 25%, transparent 25%),
+    linear-gradient(315deg, var(--accent) 25%, transparent 25%),
+    linear-gradient(45deg, var(--accent) 25%, transparent 25%);
+  background-size: 12px 12px;
+  background-position: 0 0, 0 0, 6px -6px, -6px 6px;
+  opacity: 0.18;
+  margin: var(--s-5) 0;
+  border-radius: 2px;
+}
+
+/* ============================================================================
    Calendar mode toggle (Gregorian / Hijri)
    ============================================================================ */
 .cal-mode-toggle {
