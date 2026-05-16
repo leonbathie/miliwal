@@ -1446,6 +1446,273 @@ h2[data-i18n="lexicon_title"]::after {
 }
 
 /* ============================================================================
+   Live indicator (pulsing dot in dashboard header)
+   ============================================================================ */
+.live-badge {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 5px;
+  margin-left: var(--s-2);
+  padding: 2px 8px;
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--accent-warm);
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: var(--r-full);
+  text-transform: uppercase;
+}
+
+.live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 4px #4ade80;
+  animation: live-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* ============================================================================
+   Hamburger + drawer (mobile menu)
+   ============================================================================ */
+.btn-hamburger {
+  display: none; /* mobile only via @media */
+  width: 36px;
+  height: 36px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+
+.btn-hamburger:hover { border-color: rgba(212, 175, 55, 0.4); }
+
+.hamburger-line {
+  display: block;
+  width: 16px;
+  height: 1.5px;
+  background: var(--text-2);
+  border-radius: 2px;
+  transition: transform var(--t-base), opacity var(--t-base);
+}
+
+#main-nav.menu-open .btn-hamburger {
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+#main-nav.menu-open .hamburger-line:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+#main-nav.menu-open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+#main-nav.menu-open .hamburger-line:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
+/* Drawer */
+.nav-drawer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+/* ============================================================================
+   Tools modal
+   ============================================================================ */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-4);
+}
+
+.modal.hidden { display: none; }
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: modal-fade-in 0.18s var(--ease);
+}
+
+:root[data-theme="light"] .modal-backdrop {
+  background: rgba(26, 28, 42, 0.4);
+}
+
+.modal-panel {
+  position: relative;
+  width: min(640px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-3);
+  box-shadow: var(--shadow-lg);
+  animation: modal-slide-up 0.22s var(--ease);
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modal-slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--divider);
+  position: sticky;
+  top: 0;
+  background: inherit;
+  z-index: 1;
+}
+
+.modal-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  margin: 0;
+  color: var(--text-1);
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-2);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: var(--r-2);
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.modal-close:hover {
+  background: var(--surface-2);
+  color: var(--text-1);
+}
+
+.modal-body { padding: var(--s-5); }
+
+.tool-section { margin-bottom: var(--s-6); }
+.tool-section:last-child { margin-bottom: 0; }
+
+.tool-section h3 {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent-warm);
+  margin-bottom: var(--s-3);
+}
+
+.tool-input {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  color: var(--text-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-2);
+}
+
+.tool-range {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-bottom: var(--s-3);
+  flex-wrap: wrap;
+}
+.tool-arrow {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 16px;
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+}
+
+.tool-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--s-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-2);
+}
+
+.tool-fact-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-3);
+}
+.tool-fact-value {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-top: 2px;
+}
+.tool-fact-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.tool-result {
+  padding: var(--s-3) var(--s-4);
+  background: var(--accent-bg);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: var(--r-2);
+}
+.tool-result-big {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: var(--accent-warm);
+  line-height: 1.1;
+}
+.tool-result-sub {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================================================
    Cultural Pulaagu illustrations
    ============================================================================ */
 

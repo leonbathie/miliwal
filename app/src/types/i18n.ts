@@ -147,6 +147,30 @@ export interface Translations {
   title_wind_rose: string;
   title_sky_map: string;
   sky_map_hint: string;
+
+  // Hamburger / tools modal
+  nav_tools: string;
+  tools_title: string;
+  tools_today: string;
+  tools_pick_date: string;
+  tools_between: string;
+  tools_label_day: string;
+  tools_label_fulfulde_month: string;
+  tools_label_doy: string;
+  tools_label_week: string;
+  tools_label_diff: string;
+  tools_label_day_length: string;
+  tools_today_is: string;
+  tools_in_days: string;
+  tools_ago: string;
+  tools_weeks: string;
+  tools_months: string;
+  tools_years: string;
+  lbl_days_plural: string;
+
+  // Live indicator
+  live_updated_just_now: string;
+  live_updated_ago: string;
   visibility_visible: string;
   visibility_below: string;
   magnitude_label: string;

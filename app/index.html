@@ -40,10 +40,44 @@
         <option value="ff">FF · Fulfulde</option>
         <option value="en">EN · English</option>
       </select>
+      <button data-action="open-tools" data-i18n="nav_tools">Outils</button>
       <button data-action="print" data-i18n="nav_print">Imprimer</button>
       <button id="btn-install" class="btn-install hidden" data-action="install-app" data-i18n="install_app">Installer</button>
     </div>
   </nav>
+
+  <!-- Tools modal: date calculator + calendar conversions -->
+  <div id="tools-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="tools-modal-title">
+    <div class="modal-backdrop" data-action="close-tools"></div>
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h2 id="tools-modal-title" data-i18n="tools_title">Outils — Calculs de dates</h2>
+        <button class="modal-close" data-action="close-tools" aria-label="Fermer">&times;</button>
+      </div>
+      <div class="modal-body">
+        <section class="tool-section">
+          <h3 data-i18n="tools_today">Aujourd'hui en chiffres</h3>
+          <div class="tool-grid" id="tools-today"></div>
+        </section>
+
+        <section class="tool-section">
+          <h3 data-i18n="tools_pick_date">Une date précise</h3>
+          <input type="date" id="tools-pick-date" class="tool-input" aria-label="Date" />
+          <div class="tool-grid" id="tools-pick-result"></div>
+        </section>
+
+        <section class="tool-section">
+          <h3 data-i18n="tools_between">Jours entre 2 dates</h3>
+          <div class="tool-range">
+            <input type="date" id="tools-from-date" class="tool-input" aria-label="Du" />
+            <span class="tool-arrow">→</span>
+            <input type="date" id="tools-to-date" class="tool-input" aria-label="Au" />
+          </div>
+          <div id="tools-between-result" class="tool-result"></div>
+        </section>
+      </div>
+    </div>
+  </div>
 
   <main class="container">
 
@@ -117,10 +151,23 @@
         <span data-illustration="acacia"></span>
         <span data-illustration="zebu"></span>
         <span data-illustration="calabash"></span>
+        <span data-illustration="millet"></span>
+        <span data-illustration="peulhat"></span>
       </div>
 
       <div id="calendar-grid" class="months-grid"></div>
       <p class="calendar-scroll-hint">glissez pour naviguer entre les mois</p>
+
+      <!-- Cultural frieze: domestic objects (kitchen, music, adornment) -->
+      <div class="cultural-frieze cultural-frieze-domestic" aria-hidden="true">
+        <span data-illustration="mortier"></span>
+        <span data-illustration="teapot"></span>
+        <span data-illustration="marmite"></span>
+        <span data-illustration="tama"></span>
+        <span data-illustration="jewelry"></span>
+        <span data-illustration="calabash"></span>
+        <span data-illustration="peulhat"></span>
+      </div>
 
       <h2 data-i18n="lexicon_title">Lexique et Repères</h2>
       <div class="info-cards" id="lexicon-container"></div>
@@ -137,6 +184,9 @@
             <span>Lat <span id="dash-lat">14.7167</span></span>
             <span> · Lon <span id="dash-lon">-17.4677</span></span>
             <span> · <span id="dash-time">—</span></span>
+            <span class="live-badge" title="Mise à jour en continu">
+              <span class="live-dot"></span>LIVE
+            </span>
           </div>
         </div>
         <div class="dashboard-actions">

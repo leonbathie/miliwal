@@ -35,19 +35,40 @@ export function rerenderWeatherFromCache(): void {
   renderAllPanels(state.lastWeather);
 }
 
+/** Briefly flash a status message in the location label. */
+function flashLocationStatus(msg: string, revertTo: string, ms = 2400): void {
+  setText('dash-location', msg);
+  window.setTimeout(() => setText('dash-location', revertTo), ms);
+}
+
 /** Request the browser's geolocation, then refresh weather. */
 export async function useMyLocation(): Promise<void> {
-  setText('dash-location', '...');
+  const previousLabel = document.getElementById('dash-location')?.innerText ?? 'Position';
+  setText('dash-location', 'Localisation…');
   try {
     const coords = await getCurrentPosition();
     state.lat = coords.lat;
     state.lon = coords.lon;
-    setText('dash-location', 'GPS Position');
+    setText('dash-location', 'Position GPS');
     setText('dash-lat', state.lat.toFixed(4));
     setText('dash-lon', state.lon.toFixed(4));
     await refreshWeather();
   } catch (err) {
-    console.error('Geolocation error', err);
-    alert('Erreur géolocalisation.');
+    // A GeolocationPositionError carries a code:
+    //   1 PERMISSION_DENIED, 2 POSITION_UNAVAILABLE, 3 TIMEOUT
+    // User denial is the normal flow when they decline the browser prompt —
+    // it must not surface as a red error. Only log when truly unexpected.
+    const code = (err as GeolocationPositionError | undefined)?.code;
+    if (code === 1) {
+      flashLocationStatus('Géolocalisation refusée', previousLabel);
+    } else if (code === 2) {
+      flashLocationStatus('Position indisponible', previousLabel);
+    } else if (code === 3) {
+      flashLocationStatus('Délai dépassé', previousLabel);
+    } else {
+      // Truly unexpected — keep a debug trail without alarming the user.
+      console.warn('Geolocation unexpected error', err);
+      flashLocationStatus('Erreur de localisation', previousLabel);
+    }
   }
 }

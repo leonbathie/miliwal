@@ -17,7 +17,12 @@ export type IllustrationName =
   | 'millet'      // millet / sorghum ear (mil, sorgho)
   | 'crescent'    // crescent + star (cultural celestial)
   | 'pastoral'    // composed scene: tree + sun + zebu
-  | 'pattern';    // repeating diamond textile motif
+  | 'pattern'     // repeating diamond textile motif
+  | 'mortier'     // wooden mortar + pestle for pounding millet (gusal)
+  | 'teapot'      // Sahelian tea pot for the three rounds of attaya
+  | 'tama'        // hourglass talking drum
+  | 'marmite'     // earthen cooking pot
+  | 'jewelry';    // silver hoop earrings worn by Fulani women
 
 const COMMON_ATTRS =
   'xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" ' +
@@ -164,6 +169,90 @@ const PASTORAL = `
 /*  Repeating textile pattern (diamond / triangle motif)                      */
 /* -------------------------------------------------------------------------- */
 
+const MORTIER = `
+  <!-- Wooden mortar (gusal) and pestle for pounding millet -->
+  <!-- Mortar -->
+  <path d="M16 22 q-2 0-2 2 v8 q0 8 6 14 q3 4 10 4 q7 0 10-4 q6-6 6-14 v-8 q0-2-2-2 z"/>
+  <!-- Inner well -->
+  <ellipse cx="30" cy="24" rx="14" ry="2.5"/>
+  <!-- Decorative bands -->
+  <path d="M19 34 h22 M19 38 h22"/>
+  <!-- Pestle leaning out -->
+  <path d="M42 6 l8 14" stroke-width="2"/>
+  <path d="M50 20 q-1 1-2 1.5 q-2-1.5-1-3 l1-1.5 q1.5-1.5 3 0 q1 1.5 0 3 z"/>
+`;
+
+const TEAPOT = `
+  <!-- Sahelian tea pot for attaya (3-round Maghrebi-style tea) -->
+  <!-- Body (round teapot) -->
+  <path d="M18 22 q0-6 6-7 h12 q6 1 6 7
+           q2 1 2 4 v8
+           q0 4-3 6 h-22
+           q-3-2-3-6 v-8
+           q0-3 2-4 z"/>
+  <!-- Lid + handle on top -->
+  <path d="M24 15 h12 M28 12 h4 M30 12 v-3 M28 9 h4"/>
+  <!-- Long curved spout -->
+  <path d="M16 26 q-6-1-8 4 q-1 4 4 6" stroke-linecap="round"/>
+  <!-- Handle on the right -->
+  <path d="M44 26 q4-1 4 4 q0 5-4 6"/>
+  <!-- Steam rising -->
+  <path d="M30 8 q-1-2 1-4 q2-2 0-4 M34 9 q-1-2 1-3" stroke-dasharray="0" opacity="0.6"/>
+`;
+
+const TAMA = `
+  <!-- Hourglass-shaped talking drum (tama) with side strings -->
+  <!-- Top head -->
+  <ellipse cx="30" cy="10" rx="10" ry="3"/>
+  <!-- Bottom head -->
+  <ellipse cx="30" cy="42" rx="10" ry="3"/>
+  <!-- Body sides -->
+  <path d="M20 10 q-2 10 0 16 q2 6 0 16 M40 10 q2 10 0 16 q-2 6 0 16"/>
+  <!-- Tension cords running side-to-side -->
+  <path d="M22 12 l16 30 M38 12 l-16 30 M22 22 l16 8 M22 30 l16-8" stroke-width="0.8"/>
+  <!-- Drumstick -->
+  <path d="M48 6 l8 12" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="48" cy="6" r="1.5" fill="currentColor" stroke="none"/>
+`;
+
+const MARMITE = `
+  <!-- Earthen cooking pot with handles, sitting on three stones -->
+  <!-- Pot body -->
+  <path d="M14 22 q0-3 4-3 h24 q4 0 4 3 v6 q0 8-4 14 q-2 2-12 2 q-10 0-12-2 q-4-6-4-14 z"/>
+  <!-- Rim -->
+  <path d="M13 22 h34 M14 26 h32"/>
+  <!-- Left & right handles -->
+  <path d="M14 26 q-3 2-3 4 q0 2 3 2 M46 26 q3 2 3 4 q0 2-3 2"/>
+  <!-- Three hearth stones below -->
+  <path d="M14 46 q-2-1-2-3 q0-2 2-3 q2 1 2 3 q0 2-2 3 z"/>
+  <path d="M30 46 q-2-1-2-3 q0-2 2-3 q2 1 2 3 q0 2-2 3 z"/>
+  <path d="M46 46 q-2-1-2-3 q0-2 2-3 q2 1 2 3 q0 2-2 3 z"/>
+  <!-- Steam -->
+  <path d="M22 12 q-1-2 1-4 M30 10 q-1-3 1-5 M38 12 q-1-2 1-4" opacity="0.6"/>
+`;
+
+const JEWELRY = `
+  <!-- Pair of large silver hoop earrings (kwottenndi) -->
+  <!-- Left earring -->
+  <circle cx="20" cy="26" r="11" stroke-width="2"/>
+  <circle cx="20" cy="26" r="7" stroke-width="0.7" opacity="0.7"/>
+  <!-- Top loop -->
+  <path d="M18 15 q2-3 4 0"/>
+  <!-- Hammered detail dots -->
+  <circle cx="13" cy="22" r="0.6" fill="currentColor" stroke="none"/>
+  <circle cx="13" cy="30" r="0.6" fill="currentColor" stroke="none"/>
+  <circle cx="27" cy="22" r="0.6" fill="currentColor" stroke="none"/>
+  <circle cx="27" cy="30" r="0.6" fill="currentColor" stroke="none"/>
+  <!-- Right earring -->
+  <circle cx="44" cy="26" r="11" stroke-width="2"/>
+  <circle cx="44" cy="26" r="7" stroke-width="0.7" opacity="0.7"/>
+  <path d="M42 15 q2-3 4 0"/>
+  <circle cx="37" cy="22" r="0.6" fill="currentColor" stroke="none"/>
+  <circle cx="37" cy="30" r="0.6" fill="currentColor" stroke="none"/>
+  <circle cx="51" cy="22" r="0.6" fill="currentColor" stroke="none"/>
+  <circle cx="51" cy="30" r="0.6" fill="currentColor" stroke="none"/>
+`;
+
 const PATTERN = `
   <pattern id="fulani-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
     <!-- Diamond -->
@@ -201,6 +290,11 @@ const ILLUSTRATIONS: Record<IllustrationName, IllustrationDef> = {
   crescent: { viewBox: '0 0 50 50',   body: CRESCENT },
   pastoral: { viewBox: '0 0 200 80',  body: PASTORAL },
   pattern:  { viewBox: '0 0 200 200', body: PATTERN },
+  mortier:  { viewBox: '0 0 60 50',   body: MORTIER },
+  teapot:   { viewBox: '0 0 60 50',   body: TEAPOT },
+  tama:     { viewBox: '0 0 60 50',   body: TAMA },
+  marmite:  { viewBox: '0 0 60 50',   body: MARMITE },
+  jewelry:  { viewBox: '0 0 60 50',   body: JEWELRY },
 };
 
 /** Return an inline SVG string for the given illustration. */

@@ -20,6 +20,12 @@ import { renderLocationsSelect, findLocationById } from '@/components/locations-
 import { icon, type IconName } from '@/components/icons';
 import { mountLogo, logoSvg } from '@/components/logo';
 import { hydrateIllustrations } from '@/components/illustrations';
+import {
+  bindToolsModal,
+  closeToolsModal,
+  openToolsModal,
+  refreshToolsLabels,
+} from '@/components/tools-modal';
 import { initTheme, toggleTheme, getTheme, type Theme } from '@/services/theme';
 import { buildHijriCalendar } from '@/components/hijri-calendar';
 import { renderPlanets } from '@/components/planets-card';
@@ -102,6 +108,7 @@ function applyLanguageEverywhere(): void {
   renderConstellations();
   renderComputedEclipses();
   renderSkyMap();
+  refreshToolsLabels();
   rerenderWeatherFromCache();
 }
 
@@ -281,6 +288,22 @@ function bindActions(): void {
         renderSkyMap();
         break;
       }
+      case 'toggle-menu': {
+        const nav = document.getElementById('main-nav');
+        if (!nav) break;
+        const isOpen = nav.classList.toggle('menu-open');
+        actionEl.setAttribute('aria-expanded', String(isOpen));
+        break;
+      }
+      case 'open-tools':
+        openToolsModal();
+        // Close the mobile drawer if it was open
+        document.getElementById('main-nav')?.classList.remove('menu-open');
+        document.querySelector<HTMLElement>('.btn-hamburger')?.setAttribute('aria-expanded', 'false');
+        break;
+      case 'close-tools':
+        closeToolsModal();
+        break;
     }
   });
 
@@ -358,6 +381,7 @@ function init(): void {
   updateStaticTexts();
   hydrateIcons();
   hydrateIllustrations();
+  bindToolsModal();
   refreshThemeButton();
   mountLogo('brand-logo', 28);
   const footerLogo = document.querySelector('.brand-footer-logo');
