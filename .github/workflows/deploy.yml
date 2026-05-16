@@ -22,8 +22,10 @@ jobs:
       run:
         working-directory: app
 
+    # Secrets cannot be referenced directly inside step `if:` expressions.
+    # Re-export them as job-level env so `env.RELOAD_NGINX` is usable below.
     env:
-      VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+      RELOAD_NGINX: ${{ secrets.RELOAD_NGINX }}
 
     steps:
       - name: Checkout
@@ -42,28 +44,61 @@ jobs:
       - name: Build production bundle
         run: npm run build
 
-      - name: Prepare SSH
+      - name: Verify required secrets
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PATH: ${{ secrets.VPS_PATH }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
         run: |
+          missing=()
+          [ -z "$VPS_HOST" ] && missing+=("VPS_HOST")
+          [ -z "$VPS_USER" ] && missing+=("VPS_USER")
+          [ -z "$VPS_PATH" ] && missing+=("VPS_PATH")
+          [ -z "$VPS_SSH_KEY" ] && missing+=("VPS_SSH_KEY")
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::Missing required secrets: ${missing[*]}"
+            echo "Configure them at https://github.com/${{ github.repository }}/settings/secrets/actions"
+            exit 1
+          fi
+          echo "All required secrets are present."
+
+      - name: Prepare SSH
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          port="${VPS_PORT:-22}"
           mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p "${VPS_PORT}" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -p "$port" -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "SSH ready (port $port)."
 
       - name: Deploy via rsync
-        # IMPORTANT: VPS_PATH must point to a dedicated directory. `--delete`
-        # removes any file at that path that is not in app/dist, which is what
-        # we want for a clean static drop. Do not point VPS_PATH at a shared
-        # location (it will be wiped).
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PATH: ${{ secrets.VPS_PATH }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
         run: |
+          port="${VPS_PORT:-22}"
           rsync -avz --delete --human-readable \
-            -e "ssh -i ~/.ssh/deploy_key -p ${VPS_PORT} -o StrictHostKeyChecking=accept-new" \
+            -e "ssh -i ~/.ssh/deploy_key -p $port -o StrictHostKeyChecking=accept-new" \
             dist/ \
-            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PATH }}/"
+            "${VPS_USER}@${VPS_HOST}:${VPS_PATH}/"
 
       - name: Reload Nginx (optional)
-        if: ${{ secrets.RELOAD_NGINX == 'true' }}
+        if: env.RELOAD_NGINX == 'true'
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
         run: |
-          ssh -i ~/.ssh/deploy_key -p "${VPS_PORT}" \
+          port="${VPS_PORT:-22}"
+          ssh -i ~/.ssh/deploy_key -p "$port" \
             -o StrictHostKeyChecking=accept-new \
-            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "${VPS_USER}@${VPS_HOST}" \
             "sudo systemctl reload nginx"
