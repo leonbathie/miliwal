@@ -7,7 +7,8 @@
  */
 
 export function logoSvg(size = 32): string {
-  const baseUrl = import.meta.env.BASE_URL ?? '/';
+  // @ts-ignore: Bypass TS error on import.meta.env for the CI build
+  const baseUrl = (import.meta as any).env?.BASE_URL ?? '/';
   return `
     <img class="brand-logo-img" src="${baseUrl}logo.gif" alt="Pulaagu logo" width="${size}" height="${size}">
   `;
