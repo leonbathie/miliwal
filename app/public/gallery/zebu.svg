@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="zSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2d6fa6"/>
+      <stop offset="55%" stop-color="#f0a048"/>
+      <stop offset="100%" stop-color="#c85a20"/>
+    </linearGradient>
+    <linearGradient id="zGround" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c8a25a"/>
+      <stop offset="100%" stop-color="#7a5020"/>
+    </linearGradient>
+    <linearGradient id="zBody" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#a06a30"/>
+      <stop offset="40%" stop-color="#7a4e1e"/>
+      <stop offset="100%" stop-color="#3e2406"/>
+    </linearGradient>
+    <radialGradient id="zSun" cx="50%" cy="50%">
+      <stop offset="0%" stop-color="#ffe870"/>
+      <stop offset="40%" stop-color="#ffd040" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ff8800" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="zBlur">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="800" height="600" fill="url(#zSky)"/>
+
+  <!-- Sun halo -->
+  <circle cx="620" cy="160" r="90" fill="url(#zSun)" opacity="0.7"/>
+  <circle cx="620" cy="160" r="30" fill="#ffe040"/>
+
+  <!-- Horizon haze -->
+  <ellipse cx="400" cy="400" rx="500" ry="60" fill="#e08030" opacity="0.3"/>
+
+  <!-- Background trees (acacia silhouettes) -->
+  <g fill="#2d1a06" opacity="0.55">
+    <rect x="60" y="310" width="7" height="88"/>
+    <ellipse cx="63" cy="305" rx="32" ry="12"/>
+    <rect x="700" y="280" width="9" height="115"/>
+    <ellipse cx="704" cy="274" rx="42" ry="15"/>
+    <rect x="530" y="320" width="6" height="74"/>
+    <ellipse cx="533" cy="315" rx="25" ry="10"/>
+  </g>
+
+  <!-- Ground -->
+  <rect y="395" width="800" height="205" fill="url(#zGround)"/>
+  <!-- Ground texture layers -->
+  <path d="M0 410 Q150 395 320 408 Q500 422 680 405 Q750 400 800 408 L800 600 L0 600Z" fill="#b08840" opacity="0.5"/>
+  <path d="M0 430 Q200 418 400 432 Q600 448 800 428 L800 600 L0 600Z" fill="#8a6830" opacity="0.4"/>
+
+  <!-- Dust cloud near hooves (atmosphere) -->
+  <ellipse cx="380" cy="480" rx="180" ry="22" fill="#c8a060" opacity="0.35" filter="url(#zBlur)"/>
+
+  <!-- === ZEBU BODY === -->
+  <g transform="translate(160, 220)">
+    <!-- Body shadow on ground -->
+    <ellipse cx="235" cy="262" rx="165" ry="22" fill="#3e2406" opacity="0.4"/>
+
+    <!-- Main body -->
+    <ellipse cx="235" cy="170" rx="165" ry="88" fill="url(#zBody)"/>
+
+    <!-- Belly lighter area -->
+    <ellipse cx="235" cy="208" rx="100" ry="45" fill="#8a5a28" opacity="0.5"/>
+
+    <!-- Shoulder hump (zebu characteristic) -->
+    <path d="M280 85 Q330 28 375 58 Q398 82 370 112 Q340 82 280 95Z" fill="#8a5a28"/>
+    <path d="M295 85 Q340 35 378 62 Q385 78 360 105 Q330 80 295 90Z" fill="#a06a38"/>
+
+    <!-- Neck -->
+    <path d="M90 130 Q68 80 88 60 Q115 40 145 78 Q135 100 110 125Z" fill="#8a5428"/>
+    <path d="M92 128 Q72 85 90 66 Q115 50 140 80Z" fill="#a06838" opacity="0.6"/>
+
+    <!-- Dewlap -->
+    <path d="M95 148 Q82 198 96 228 Q112 210 115 165Z" fill="#6a3e1a"/>
+    <path d="M100 152 Q88 195 100 220 Q112 200 110 158Z" fill="#5a3010" opacity="0.7"/>
+
+    <!-- Head -->
+    <ellipse cx="66" cy="80" rx="46" ry="36" fill="#9a6030"/>
+    <!-- Head shading -->
+    <ellipse cx="55" cy="88" rx="30" ry="22" fill="#7a4820" opacity="0.5"/>
+
+    <!-- Snout/muzzle -->
+    <ellipse cx="34" cy="96" rx="22" ry="15" fill="#6a3e1e"/>
+    <ellipse cx="34" cy="98" rx="18" ry="10" fill="#5a3010"/>
+
+    <!-- Nostrils -->
+    <ellipse cx="26" cy="100" r="4.5" fill="#2e1606" rx="4.5" ry="3"/>
+    <ellipse cx="40" cy="102" r="4.5" fill="#2e1606" rx="4.5" ry="3"/>
+
+    <!-- Eye -->
+    <circle cx="82" cy="62" r="9" fill="#1a0c04"/>
+    <circle cx="80" cy="62" r="8" fill="#3a2010"/>
+    <circle cx="80" cy="62" r="5" fill="#1a0c04"/>
+    <circle cx="82" cy="60" r="2.5" fill="white" opacity="0.7"/>
+
+    <!-- Eyelash/brow -->
+    <path d="M72 56 Q80 50 90 54" stroke="#2a1406" stroke-width="1.5" fill="none"/>
+
+    <!-- Ear -->
+    <path d="M100 52 Q115 30 108 48" fill="#8a5020" stroke="#6a3810" stroke-width="1"/>
+
+    <!-- Horns — long, sweeping outward -->
+    <path d="M68 50 Q52 8 14 -22" stroke="#d4b060" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="M80 46 Q100 8 134 -18" stroke="#d4b060" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <!-- Horn tips (darker) -->
+    <circle cx="14" cy="-22" r="4" fill="#a08030"/>
+    <circle cx="134" cy="-18" r="4" fill="#a08030"/>
+
+    <!-- Legs - visible front pair and rear pair -->
+    <!-- Front left (near) -->
+    <rect x="75" y="240" width="24" height="90" rx="7" fill="#6a3e1a"/>
+    <rect x="75" y="315" width="24" height="18" rx="5" fill="#4a2a0a"/>
+    <!-- Front right (far) -->
+    <rect x="115" y="235" width="20" height="88" rx="6" fill="#5a3412"/>
+    <rect x="115" y="308" width="20" height="16" rx="5" fill="#3e2208"/>
+    <!-- Rear left (near) -->
+    <path d="M335 240 Q350 255 355 310 L370 310 L368 230Z" fill="#6a3e1a"/>
+    <rect x="355" y="310" width="24" height="18" rx="5" fill="#4a2a0a"/>
+    <!-- Rear right (far) -->
+    <path d="M358 235 Q372 250 376 305 L390 305 L388 225Z" fill="#5a3412"/>
+    <rect x="376" y="305" width="20" height="16" rx="5" fill="#3e2208"/>
+
+    <!-- Tail -->
+    <path d="M398 165 Q435 155 448 190 Q450 220 440 238" stroke="#5a3412" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M440 230 Q448 248 436 262 Q428 270 432 282" stroke="#3e2208" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- Tail tuft -->
+    <ellipse cx="432" cy="285" rx="10" ry="14" fill="#3e2208"/>
+  </g>
+
+  <!-- Grass tufts -->
+  <g fill="#7a6020" opacity="0.8">
+    <path d="M20 442 Q24 420 28 442M36 448 Q40 426 44 448M55 438 Q59 416 63 438"/>
+    <path d="M630 440 Q634 418 638 440M650 448 Q654 426 658 448M672 436 Q676 414 680 436"/>
+    <path d="M720 444 Q724 422 728 444M745 450 Q749 428 753 450"/>
+  </g>
+
+  <!-- Label / atmosphere text (optional overlay) -->
+  <text x="400" y="575" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#c8a060" opacity="0.7" letter-spacing="3">NAGGE FULƁE</text>
+</svg>

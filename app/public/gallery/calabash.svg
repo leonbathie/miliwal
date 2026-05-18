@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <radialGradient id="cBg" cx="50%" cy="30%">
+      <stop offset="0%" stop-color="#2a1e10"/>
+      <stop offset="100%" stop-color="#0a0806"/>
+    </radialGradient>
+    <radialGradient id="cBody" cx="35%" cy="30%">
+      <stop offset="0%" stop-color="#d4820c"/>
+      <stop offset="40%" stop-color="#a85a06"/>
+      <stop offset="75%" stop-color="#7a3e04"/>
+      <stop offset="100%" stop-color="#4a2002"/>
+    </radialGradient>
+    <radialGradient id="cNeck" cx="40%" cy="30%">
+      <stop offset="0%" stop-color="#c07a10"/>
+      <stop offset="100%" stop-color="#6a3e06"/>
+    </radialGradient>
+    <radialGradient id="cHighlight" cx="30%" cy="20%">
+      <stop offset="0%" stop-color="#f0b040" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#f0b040" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cSurface" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a2810"/>
+      <stop offset="100%" stop-color="#1a1008"/>
+    </linearGradient>
+    <filter id="cShadow">
+      <feDropShadow dx="8" dy="12" stdDeviation="12" flood-color="#000" flood-opacity="0.7"/>
+    </filter>
+    <filter id="cGlow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="600" fill="url(#cBg)"/>
+
+  <!-- Ambient light from left -->
+  <ellipse cx="120" cy="300" rx="200" ry="300" fill="#8a5020" opacity="0.12"/>
+
+  <!-- Surface/table -->
+  <path d="M0 480 Q400 465 800 480 L800 600 L0 600Z" fill="url(#cSurface)"/>
+  <!-- Surface highlight -->
+  <path d="M0 480 Q400 465 800 480 L800 485 Q400 470 0 485Z" fill="#5a3e18" opacity="0.5"/>
+
+  <!-- === CALABASH / GOURD === -->
+  <g filter="url(#cShadow)">
+    <!-- Gourd shadow on table -->
+    <ellipse cx="405" cy="484" rx="95" ry="15" fill="#000" opacity="0.5"/>
+
+    <!-- Main body of gourd (large round bottom) -->
+    <ellipse cx="400" cy="360" rx="160" ry="148" fill="url(#cBody)"/>
+
+    <!-- Body highlight (specular) -->
+    <ellipse cx="340" cy="260" rx="55" ry="45" fill="url(#cHighlight)"/>
+
+    <!-- Neck constriction -->
+    <path d="M360 218 Q375 195 390 182 L410 182 Q425 195 440 218Z" fill="url(#cNeck)"/>
+
+    <!-- Neck cylinder -->
+    <rect x="382" y="138" width="36" height="48" rx="8" fill="url(#cNeck)"/>
+
+    <!-- Neck rings (decorative) -->
+    <ellipse cx="400" cy="158" rx="20" ry="5" fill="#c07820" stroke="#e0a030" stroke-width="1"/>
+    <ellipse cx="400" cy="170" rx="20" ry="5" fill="#c07820" stroke="#e0a030" stroke-width="1"/>
+    <ellipse cx="400" cy="182" rx="18" ry="4" fill="#a06018"/>
+
+    <!-- Neck top opening -->
+    <ellipse cx="400" cy="138" rx="18" ry="6" fill="#2a1a08"/>
+    <ellipse cx="400" cy="136" rx="15" ry="4" fill="#1a0e04"/>
+  </g>
+
+  <!-- === DECORATIVE GEOMETRIC PATTERNS on gourd body === -->
+  <!-- Pattern band 1 (upper) -->
+  <g stroke="#e0c060" stroke-width="1.8" fill="none" opacity="0.85">
+    <path d="M260 300 L290 275 L320 300 L290 325Z"/>
+    <path d="M320 300 L350 275 L380 300 L350 325Z"/>
+    <path d="M380 300 L410 275 L440 300 L410 325Z"/>
+    <path d="M440 300 L470 275 L500 300 L470 325Z"/>
+    <path d="M500 300 L530 275 L545 300 L530 325Z"/>
+  </g>
+  <!-- Pattern dots in diamonds -->
+  <g fill="#e0c060" opacity="0.8">
+    <circle cx="290" cy="300" r="3.5"/>
+    <circle cx="350" cy="300" r="3.5"/>
+    <circle cx="410" cy="300" r="3.5"/>
+    <circle cx="470" cy="300" r="3.5"/>
+  </g>
+
+  <!-- Pattern band 2 (middle) -->
+  <g stroke="#d4a040" stroke-width="1.5" fill="none" opacity="0.75">
+    <path d="M250 355 Q275 340 300 355 Q325 370 350 355 Q375 340 400 355 Q425 370 450 355 Q475 340 500 355 Q525 370 550 355"/>
+  </g>
+
+  <!-- Pattern band 3 (lower) - triangles pointing up -->
+  <g stroke="#b87830" stroke-width="1.5" fill="none" opacity="0.7">
+    <path d="M268 405 L295 378 L322 405Z M322 405 L349 378 L376 405Z M376 405 L403 378 L430 405Z M430 405 L457 378 L484 405Z M484 405 L511 378 L530 405Z"/>
+  </g>
+  <!-- Triangles fill with gold tone -->
+  <g fill="#c8901a" opacity="0.4">
+    <path d="M268 405 L295 378 L322 405Z"/>
+    <path d="M376 405 L403 378 L430 405Z"/>
+    <path d="M484 405 L511 378 L530 405Z"/>
+  </g>
+
+  <!-- Vertical stripe details -->
+  <g stroke="#c87820" stroke-width="1" opacity="0.5">
+    <line x1="260" y1="260" x2="248" y2="445"/>
+    <line x1="540" y1="260" x2="552" y2="445"/>
+  </g>
+
+  <!-- Rim highlights -->
+  <ellipse cx="400" cy="220" rx="95" ry="20" fill="none" stroke="#e0a040" stroke-width="2" opacity="0.6"/>
+
+  <!-- Bottom of gourd -->
+  <ellipse cx="400" cy="505" rx="60" ry="12" fill="#3e2008" opacity="0.8"/>
+
+  <!-- Small secondary calabash (decorative) -->
+  <g transform="translate(610, 380)" opacity="0.75">
+    <ellipse cx="0" cy="40" rx="48" ry="42" fill="#8a5010"/>
+    <rect x="-8" y="-4" width="16" height="22" rx="4" fill="#7a4408"/>
+    <ellipse cx="0" cy="-4" rx="10" ry="3" fill="#2a1606"/>
+    <!-- Simple pattern -->
+    <path d="M-30 30 L-10 15 L10 30 L-10 45Z M10 30 L30 15 L38 30 L30 45Z" stroke="#c8900a" stroke-width="1.2" fill="none"/>
+    <ellipse cx="0" cy="88" rx="35" ry="8" fill="#000" opacity="0.4"/>
+  </g>
+
+  <!-- Millet grains scattered (context) -->
+  <g fill="#d4a820" opacity="0.6">
+    <ellipse cx="260" cy="490" rx="5" ry="3"/>
+    <ellipse cx="275" cy="495" rx="4" ry="2.5"/>
+    <ellipse cx="525" cy="488" rx="5" ry="3"/>
+    <ellipse cx="538" cy="493" rx="4" ry="2.5"/>
+    <ellipse cx="552" cy="487" rx="4.5" ry="2.5"/>
+  </g>
+
+  <text x="400" y="578" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#d4a040" opacity="0.8" letter-spacing="3">HORDE · PULAAGU</text>
+</svg>
