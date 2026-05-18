@@ -2543,20 +2543,50 @@ h2[data-i18n="lexicon_title"]::after {
    Brand footer mark
    ============================================================================ */
 .brand-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--s-3);
+  position: relative;
+  overflow: hidden;
   margin-top: var(--s-9);
-  padding-top: var(--s-6);
-  text-align: center;
-  border-top: 1px solid var(--divider);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 28px 28px 0 0;
+  background:
+    radial-gradient(ellipse at 50% 18%, rgba(242, 208, 139, 0.12), transparent 42%),
+    linear-gradient(180deg, rgba(12, 14, 28, 0.35), rgba(9, 11, 20, 0.96));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.brand-footer-scene {
+  position: relative;
+  min-height: 320px;
+}
+
+.brand-footer-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.brand-footer-copy {
+  position: absolute;
+  left: var(--s-6);
+  right: var(--s-6);
+  bottom: var(--s-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  background: linear-gradient(90deg, rgba(9, 11, 20, 0.74), rgba(9, 11, 20, 0.18));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  backdrop-filter: blur(8px);
+  z-index: 1;
 }
 
 .brand-footer-logo {
   display: inline-flex;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
 }
 
 .brand-footer-logo svg { width: 100%; height: 100%; }
@@ -2564,7 +2594,7 @@ h2[data-i18n="lexicon_title"]::after {
 .brand-footer p {
   font-family: var(--font-display);
   font-style: italic;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-2);
   letter-spacing: 0.04em;
   margin: 0;
@@ -2573,9 +2603,11 @@ h2[data-i18n="lexicon_title"]::after {
 .brand-footer .brand-mark {
   font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--text-4);
+  color: rgba(248, 243, 231, 0.66);
+  text-align: right;
+  white-space: nowrap;
 }
 
 /* ============================================================================
@@ -2959,8 +2991,20 @@ h2[data-i18n="lexicon_title"]::after {
   .calendar-scroll-hint::after { content: ' ›'; color: var(--accent); }
 
   /* --- FOOTER --- */
-  .brand-footer { margin-top: var(--s-7); padding-top: var(--s-5); }
-  .brand-footer-logo { width: 32px; height: 32px; }
+  .brand-footer {
+    margin-top: var(--s-7);
+    border-radius: 22px 22px 0 0;
+  }
+  .brand-footer-scene { min-height: 280px; }
+  .brand-footer-copy {
+    left: var(--s-4);
+    right: var(--s-4);
+    bottom: var(--s-4);
+    padding: var(--s-2) var(--s-3);
+  }
+  .brand-footer-logo { width: 30px; height: 30px; }
+  .brand-footer p { font-size: 14px; }
+  .brand-footer .brand-mark { letter-spacing: 0.22em; }
 
   /* --- DATA SCI BLOCK --- */
   .sci-astro-data { padding: var(--s-2) var(--s-3); }
@@ -2973,6 +3017,17 @@ h2[data-i18n="lexicon_title"]::after {
   .brand-name { display: none; } /* keep logo only */
   nav button, .lang-select { font-size: 11px; padding: 5px 8px; }
   nav button[data-action="print"] { display: none; } /* keep critical actions */
+  .brand-footer-scene { min-height: 240px; }
+  .brand-footer-copy {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-2);
+  }
+  .brand-footer .brand-mark {
+    white-space: normal;
+    text-align: left;
+    letter-spacing: 0.18em;
+  }
 
   .header-cal { padding: var(--s-5) var(--s-2) var(--s-4); }
   .header-cal h1 { font-size: 1.8rem; }
