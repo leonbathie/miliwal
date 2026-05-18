@@ -7,8 +7,9 @@
  */
 
 export function logoSvg(size = 32): string {
+  const baseUrl = import.meta.env.BASE_URL ?? '/';
   return `
-    <img src="/logo.gif" alt="Pulaagu logo" width="${size}" height="${size}" style="border-radius: 14px;">
+    <img class="brand-logo-img" src="${baseUrl}logo.gif" alt="Pulaagu logo" width="${size}" height="${size}">
   `;
 }
 
