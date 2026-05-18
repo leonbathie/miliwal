@@ -27,6 +27,7 @@ export interface GalleryItem {
  */
 export const GALLERY: GalleryItem[] = [
   {
+    photo: '/gallery/zebu.svg',
     illustration: 'zebu',
     titleFr: 'Le zébu peul',
     titleEn: 'The Fulani zebu',
@@ -39,6 +40,7 @@ export const GALLERY: GalleryItem[] = [
       'Naagge ngootal e tafuru juutugol, hade duuɓi ujunere. Nagge ko ɓernde nguurndam Pulaagu.',
   },
   {
+    photo: '/gallery/sheep.svg',
     illustration: 'sheep',
     titleFr: 'Le mouton balami',
     titleEn: 'The Balami sheep',
@@ -51,6 +53,7 @@ export const GALLERY: GalleryItem[] = [
       'Mbaalu jaltinaadi, ngu hokketeede laral, kosam e teeyngu. Maa rewa nokku peewɗo.',
   },
   {
+    photo: '/gallery/acacia.svg',
     illustration: 'acacia',
     titleFr: 'L’acacia du Sahel',
     titleEn: 'The Sahel acacia',
@@ -63,6 +66,7 @@ export const GALLERY: GalleryItem[] = [
       'Lekki mawki e ladde Sahel, e tooke maggi maaƴe. Ɗum tonki nai nder Ceedu.',
   },
   {
+    photo: '/gallery/calabash.svg',
     illustration: 'calabash',
     titleFr: 'La calebasse (horde)',
     titleEn: 'The calabash gourd',
@@ -75,6 +79,7 @@ export const GALLERY: GalleryItem[] = [
       'Horde ko duɗe duulnaande nde mooftata kosam, gawri walla ñebbe. Tuumi maayde e gite maagol.',
   },
   {
+    photo: '/gallery/herder.svg',
     illustration: 'herder',
     titleFr: 'Le pâtre (gaynaako)',
     titleEn: 'The herder',
@@ -87,6 +92,7 @@ export const GALLERY: GalleryItem[] = [
       'Gaynaako Pullo e gandal e boubou makko. Eggoo e nder hitaande ko nguurndam.',
   },
   {
+    photo: '/gallery/millet.svg',
     illustration: 'millet',
     titleFr: 'Le mil (gawri)',
     titleEn: 'Millet',

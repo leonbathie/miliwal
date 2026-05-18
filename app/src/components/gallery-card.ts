@@ -45,8 +45,10 @@ export function renderGallery(): void {
     return `
       <article class="gallery-card">
         ${visual}
-        <h4 class="gallery-title">${title}</h4>
-        <p class="gallery-desc">${desc}</p>
+        <div class="gallery-card-body">
+          <h4 class="gallery-title">${title}</h4>
+          <p class="gallery-desc">${desc}</p>
+        </div>
       </article>
     `;
   }).join('');

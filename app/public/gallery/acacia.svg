@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="aSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a3a5c"/>
+      <stop offset="35%" stop-color="#d46018"/>
+      <stop offset="65%" stop-color="#f0a030"/>
+      <stop offset="100%" stop-color="#e8c060"/>
+    </linearGradient>
+    <linearGradient id="aGround" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b89440"/>
+      <stop offset="100%" stop-color="#6a4010"/>
+    </linearGradient>
+    <radialGradient id="aSunGlow" cx="50%" cy="50%">
+      <stop offset="0%" stop-color="#ffe060" stop-opacity="1"/>
+      <stop offset="50%" stop-color="#ff8820" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ff4400" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="aBlur2">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <filter id="aLeafBlur">
+      <feGaussianBlur stdDeviation="1.2"/>
+    </filter>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="800" height="600" fill="url(#aSky)"/>
+
+  <!-- Sun setting at horizon -->
+  <circle cx="400" cy="405" r="52" fill="#ffe040"/>
+  <circle cx="400" cy="405" r="130" fill="url(#aSunGlow)"/>
+
+  <!-- Clouds (dramatic evening clouds) -->
+  <g fill="#c85020" opacity="0.45">
+    <ellipse cx="150" cy="120" rx="100" ry="28"/>
+    <ellipse cx="220" cy="108" rx="70" ry="18"/>
+    <ellipse cx="620" cy="100" rx="110" ry="30"/>
+    <ellipse cx="680" cy="88" rx="75" ry="20"/>
+  </g>
+  <g fill="#f0a040" opacity="0.35">
+    <ellipse cx="160" cy="115" rx="80" ry="20"/>
+    <ellipse cx="600" cy="95" rx="90" ry="22"/>
+  </g>
+
+  <!-- Horizon haze -->
+  <rect y="390" width="800" height="20" fill="#f0c060" opacity="0.4" filter="url(#aBlur2)"/>
+
+  <!-- Distant hills/dunes -->
+  <path d="M0 400 Q100 370 250 385 Q400 400 550 375 Q680 360 800 382 L800 420 L0 420Z" fill="#8a6428" opacity="0.7"/>
+
+  <!-- Ground -->
+  <rect y="408" width="800" height="192" fill="url(#aGround)"/>
+  <path d="M0 425 Q200 415 400 428 Q600 442 800 422 L800 600 L0 600Z" fill="#9a7030" opacity="0.5"/>
+
+  <!-- Distant small trees -->
+  <g fill="#2a1806" opacity="0.5">
+    <rect x="80" y="348" width="5" height="55"/><ellipse cx="82" cy="344" rx="22" ry="9"/>
+    <rect x="660" y="338" width="5" height="58"/><ellipse cx="662" cy="334" rx="24" ry="9"/>
+    <rect x="720" y="355" width="4" height="48"/><ellipse cx="722" cy="351" rx="18" ry="8"/>
+  </g>
+
+  <!-- === MAIN ACACIA TREE === -->
+  <g transform="translate(290, 80)">
+    <!-- Shadow on ground -->
+    <ellipse cx="160" cy="350" rx="200" ry="18" fill="#2a1806" opacity="0.35" transform="skewX(-30)"/>
+
+    <!-- Trunk -->
+    <path d="M148 340 Q150 280 155 230 Q158 200 152 170 Q148 140 155 100" stroke="#5a3a14" stroke-width="22" fill="none" stroke-linecap="round"/>
+    <path d="M152 340 Q154 280 158 230 Q161 200 155 170 Q151 140 158 100" stroke="#7a5a20" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.5"/>
+
+    <!-- Main branches -->
+    <path d="M155 100 Q100 75 40 80" stroke="#5a3a14" stroke-width="14" fill="none" stroke-linecap="round"/>
+    <path d="M155 100 Q210 72 278 78" stroke="#5a3a14" stroke-width="14" fill="none" stroke-linecap="round"/>
+    <path d="M155 115 Q120 95 82 95" stroke="#5a3a14" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M155 115 Q192 92 230 95" stroke="#5a3a14" stroke-width="10" fill="none" stroke-linecap="round"/>
+
+    <!-- Sub-branches -->
+    <path d="M40 80 Q20 65 -5 68" stroke="#5a3a14" stroke-width="7" fill="none"/>
+    <path d="M278 78 Q298 62 318 66" stroke="#5a3a14" stroke-width="7" fill="none"/>
+    <path d="M82 95 Q62 78 50 82" stroke="#5a3a14" stroke-width="6" fill="none"/>
+    <path d="M230 95 Q248 78 262 82" stroke="#5a3a14" stroke-width="6" fill="none"/>
+
+    <!-- Flat-top canopy (classic acacia shape) — layered leaf masses -->
+    <!-- Canopy base shadow -->
+    <ellipse cx="158" cy="80" rx="168" ry="42" fill="#1e3a0a" opacity="0.5" filter="url(#aLeafBlur)"/>
+
+    <!-- Leaf mass — multiple overlapping ellipses for texture -->
+    <ellipse cx="158" cy="72" rx="158" ry="38" fill="#2d5a10"/>
+    <ellipse cx="90" cy="68" rx="75" ry="26" fill="#3a6e18"/>
+    <ellipse cx="220" cy="66" rx="80" ry="28" fill="#3a6e18"/>
+    <ellipse cx="158" cy="60" rx="130" ry="22" fill="#4a8222"/>
+    <ellipse cx="100" cy="58" rx="60" ry="18" fill="#3e7418"/>
+    <ellipse cx="210" cy="56" rx="65" ry="20" fill="#3e7418"/>
+    <ellipse cx="158" cy="50" rx="100" ry="16" fill="#568c28"/>
+    <!-- Highlight on top -->
+    <ellipse cx="148" cy="44" rx="70" ry="10" fill="#6aaa32" opacity="0.7"/>
+    <!-- Sun-dappled highlights -->
+    <ellipse cx="80" cy="66" rx="18" ry="8" fill="#80c040" opacity="0.4"/>
+    <ellipse cx="230" cy="62" rx="20" ry="8" fill="#80c040" opacity="0.35"/>
+  </g>
+
+  <!-- Grasses/dry vegetation -->
+  <g stroke="#9a7820" stroke-width="2" fill="none" opacity="0.75">
+    <path d="M30 450 Q33 428 36 450M50 458 Q53 436 56 458M70 444 Q73 422 76 444"/>
+    <path d="M680 446 Q683 424 686 446M700 455 Q703 433 706 455M720 442 Q723 420 726 442"/>
+    <path d="M760 450 Q763 428 766 450M778 458 Q781 436 784 458"/>
+  </g>
+
+  <!-- Silhouette of cattle in far background -->
+  <g fill="#2a1806" opacity="0.4" transform="translate(30, 370)">
+    <ellipse cx="0" cy="30" rx="20" ry="10"/>
+    <rect x="-5" y="38" width="4" height="12" rx="2"/>
+    <rect x="8" y="38" width="4" height="12" rx="2"/>
+    <ellipse cx="620" cy="28" rx="18" ry="9"/>
+    <rect x="614" y="36" width="4" height="11" rx="2"/>
+    <rect x="626" y="36" width="4" height="11" rx="2"/>
+  </g>
+
+  <text x="400" y="576" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#c8a040" opacity="0.75" letter-spacing="3">LEKKI NGARKI · SAHEL</text>
+</svg>
