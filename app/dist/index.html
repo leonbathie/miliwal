@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0b14" />
+  <title>Calendrier Fulfulde — Temps, Météo & Astres</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-Zgpju5--.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-Dw2om400.css">
+<link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
+<body>
+
+  <nav id="main-nav">
+    <a href="/" class="nav-brand" aria-label="Pulaagu">
+      <span id="brand-logo" class="brand-logo"></span>
+      <span class="brand-name">Pulaagu</span>
+    </a>
+    <div class="nav-spacer"></div>
+
+    <!-- Always visible: primary navigation + theme + hamburger -->
+    <button id="btn-tab-cal" class="active" data-action="switch-tab" data-tab="cal" data-i18n="nav_cal">Calendrier</button>
+    <button id="btn-tab-meteo" data-action="switch-tab" data-tab="meteo" data-i18n="nav_meteo">Météo &amp; Astres</button>
+    <button id="btn-theme" class="btn-theme" data-action="toggle-theme" aria-label="Basculer le thème">
+      <span id="btn-theme-icon" class="btn-icon"></span>
+    </button>
+    <button id="btn-hamburger" class="btn-hamburger" data-action="toggle-menu" aria-label="Menu" aria-expanded="false" aria-controls="nav-drawer">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+
+    <!-- Collapsible drawer (visible inline on desktop, hidden behind hamburger on mobile) -->
+    <div class="nav-drawer" id="nav-drawer">
+      <select id="lang-select" class="lang-select" data-action="change-lang" aria-label="Language">
+        <option value="fr">FR · Français</option>
+        <option value="ff">FF · Fulfulde</option>
+        <option value="en">EN · English</option>
+      </select>
+      <button data-action="open-tools" data-i18n="nav_tools">Outils</button>
+      <button data-action="print" data-i18n="nav_print">Imprimer</button>
+      <button id="btn-install" class="btn-install hidden" data-action="install-app" data-i18n="install_app">Installer</button>
+    </div>
+  </nav>
+
+  <!-- Tools modal: date calculator + calendar conversions -->
+  <div id="tools-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="tools-modal-title">
+    <div class="modal-backdrop" data-action="close-tools"></div>
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h2 id="tools-modal-title" data-i18n="tools_title">Outils — Calculs de dates</h2>
+        <button class="modal-close" data-action="close-tools" aria-label="Fermer">&times;</button>
+      </div>
+      <div class="modal-body">
+        <section class="tool-section">
+          <h3 data-i18n="tools_today">Aujourd'hui en chiffres</h3>
+          <div class="tool-grid" id="tools-today"></div>
+        </section>
+
+        <section class="tool-section">
+          <h3 data-i18n="tools_pick_date">Une date précise</h3>
+          <input type="date" id="tools-pick-date" class="tool-input" aria-label="Date" />
+          <div class="tool-grid" id="tools-pick-result"></div>
+        </section>
+
+        <section class="tool-section">
+          <h3 data-i18n="tools_between">Jours entre 2 dates</h3>
+          <div class="tool-range">
+            <input type="date" id="tools-from-date" class="tool-input" aria-label="Du" />
+            <span class="tool-arrow">→</span>
+            <input type="date" id="tools-to-date" class="tool-input" aria-label="Au" />
+          </div>
+          <div id="tools-between-result" class="tool-result"></div>
+        </section>
+
+        <section class="tool-section">
+          <h3 data-i18n="tools_date_plus">Date + N jours</h3>
+          <div class="tool-range">
+            <input type="date" id="tools-base-date" class="tool-input" aria-label="Date de base" />
+            <span class="tool-arrow">+</span>
+            <input type="number" id="tools-offset-days" class="tool-input tool-input-num" step="1" placeholder="30" aria-label="Décalage en jours" />
+            <span data-i18n="lbl_days_plural">jours</span>
+          </div>
+          <div id="tools-date-plus-result" class="tool-result"></div>
+        </section>
+
+        <section class="tool-section">
+          <h3 data-i18n="tools_number_to_ff">Nombre en Fulfulde (0–59)</h3>
+          <input type="number" id="tools-num-input" class="tool-input tool-input-num" min="0" max="59" step="1" placeholder="42" aria-label="Nombre 0 à 59" />
+          <div id="tools-num-result" class="tool-result"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+
+    <!-- ============ TAB 1 : ALMANAC ============ -->
+    <section id="tab-cal" class="tab-content active">
+
+      <header class="header-cal">
+        <!-- Pastoral scene watermark (zebu + acacia + sun) -->
+        <div class="hero-pastoral" data-illustration="pastoral" aria-hidden="true"></div>
+        <h1 data-i18n="title_cal">Calendrier Fulfulde</h1>
+
+        <div class="year-selector">
+          <label for="year-select" data-i18n="year_label">Année</label>
+          <select id="year-select" data-action="change-year" aria-label="Année"></select>
+
+          <div class="cal-mode-toggle" role="tablist" aria-label="Mode de calendrier">
+            <button class="cal-mode-btn active" data-action="set-cal-mode" data-mode="gregorian" data-i18n="cal_mode_gregorian">Grégorien</button>
+            <button class="cal-mode-btn" data-action="set-cal-mode" data-mode="hijri" data-i18n="cal_mode_hijri">Hégirien</button>
+          </div>
+        </div>
+
+        <div id="clock-date" class="clock-date-text">—</div>
+        <div id="hijri-date" class="hijri-date-text">—</div>
+        <div id="clock-num" class="clock-time">00:00:00</div>
+        <div id="clock-moment" class="clock-moment-text">—</div>
+
+        <div class="scientific-time-data" id="sci-time-data">JD: — &middot; LST: —</div>
+
+        <div id="clock-text" class="clock-fulfulde">—</div>
+
+        <button class="btn-audio" data-action="read-time" aria-label="Lire l'heure">
+          <span class="btn-icon" data-icon="volume-2"></span>
+          <span data-i18n="btn_audio">Écouter</span>
+        </button>
+
+        <div class="header-ephemeris">
+          <div class="ephemeris-item">
+            <span class="eph-label" data-i18n="lbl_eph_season">Saison</span>
+            <span class="eph-value" id="eph-season-val">—</span>
+          </div>
+          <div class="ephemeris-item">
+            <span class="eph-label" data-i18n="lbl_eph_moon">Lune</span>
+            <span class="eph-value" id="eph-moon-val">—</span>
+          </div>
+          <div class="ephemeris-item">
+            <span class="eph-label" data-i18n="lbl_eph_sun">Soleil</span>
+            <span class="eph-value" id="eph-sun-val">—</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Daily proverb -->
+      <div class="proverb-card">
+        <div class="proverb-header">
+          <span class="proverb-eyebrow" id="proverb-title" data-i18n="proverb_title">Proverbe du jour</span>
+          <button class="btn-audio btn-audio-sm" data-action="speak-proverb">
+            <span class="btn-icon" data-icon="volume-2"></span>
+            <span data-i18n="proverb_listen">Écouter</span>
+          </button>
+        </div>
+        <blockquote id="proverb-ff" class="proverb-quote">—</blockquote>
+        <p id="proverb-translation" class="proverb-translation">—</p>
+      </div>
+
+      <!-- Cultural frieze: pastoral silhouettes -->
+      <div class="cultural-frieze" aria-hidden="true">
+        <span data-illustration="acacia"></span>
+        <span data-illustration="zebu"></span>
+        <span data-illustration="herder"></span>
+        <span data-illustration="sheep"></span>
+        <span data-illustration="acacia"></span>
+        <span data-illustration="zebu"></span>
+        <span data-illustration="calabash"></span>
+        <span data-illustration="millet"></span>
+        <span data-illustration="peulhat"></span>
+      </div>
+
+      <div id="calendar-grid" class="months-grid"></div>
+      <p class="calendar-scroll-hint">glissez pour naviguer entre les mois</p>
+
+      <!-- Cultural frieze: domestic objects (kitchen, music, adornment) -->
+      <div class="cultural-frieze cultural-frieze-domestic" aria-hidden="true">
+        <span data-illustration="mortier"></span>
+        <span data-illustration="teapot"></span>
+        <span data-illustration="marmite"></span>
+        <span data-illustration="tama"></span>
+        <span data-illustration="jewelry"></span>
+        <span data-illustration="calabash"></span>
+        <span data-illustration="peulhat"></span>
+      </div>
+
+      <!-- Cultural gallery: photos or illustrations of Pulaagu icons -->
+      <h2 data-i18n="gallery_title">Trésors du Pulaagu</h2>
+      <div class="gallery-list" id="gallery-list"></div>
+
+      <h2 data-i18n="lexicon_title">Lexique et Repères</h2>
+      <div class="info-cards" id="lexicon-container"></div>
+    </section>
+
+    <!-- ============ TAB 2 : WEATHER & ASTRO ============ -->
+    <section id="tab-meteo" class="tab-content">
+
+      <div class="dashboard-header">
+        <div>
+          <h2 data-i18n="title_meteo">Tableau Astronomique &amp; Météo</h2>
+          <div id="dash-location">Dakar, Sénégal</div>
+          <div class="dash-coords">
+            <span>Lat <span id="dash-lat">14.7167</span></span>
+            <span> · Lon <span id="dash-lon">-17.4677</span></span>
+            <span> · <span id="dash-time">—</span></span>
+            <span class="live-badge" title="Mise à jour en continu">
+              <span class="live-dot"></span>LIVE
+            </span>
+          </div>
+        </div>
+        <div class="dashboard-actions">
+          <select id="locations-select" class="locations-select" data-action="change-location" aria-label="Lieu sauvegardé"></select>
+          <button class="btn-action" data-action="use-location">
+            <span class="btn-icon" data-icon="map-pin"></span>
+            <span data-i18n="btn_location">Ma position</span>
+          </button>
+          <button class="btn-action" data-action="refresh-weather">
+            <span class="btn-icon" data-icon="refresh-cw"></span>
+            <span data-i18n="btn_refresh">Actualiser</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+
+        <!-- Current weather & agro -->
+        <div class="card col-4">
+          <h3>
+            <span class="card-title-icon" data-icon="cloud-sun"></span>
+            <span data-i18n="title_current_weather">Météo &amp; Agrométéorologie</span>
+          </h3>
+
+          <div class="current-weather">
+            <div id="w-icon" class="weather-icon"></div>
+            <div>
+              <div id="w-temp" class="temp-huge">—°</div>
+              <div id="w-desc">—</div>
+            </div>
+          </div>
+
+          <div class="weather-details">
+            <div><span data-i18n="lbl_feels">Ressenti</span> <span id="w-feels">—</span></div>
+            <div><span data-i18n="lbl_hum">Humidité</span> <span><span id="w-hum">—</span>% <span class="progress-bar-bg"><span class="progress-bar-fill" id="w-hum-bar" style="width:0%;"></span></span></span></div>
+            <div><span data-i18n="lbl_wind">Vent</span> <span><span id="w-wind">—</span> km/h</span></div>
+            <div><span data-i18n="lbl_gusts">Rafales</span> <span><span id="w-gusts">—</span> km/h</span></div>
+            <div><span data-i18n="lbl_pres">Pression</span> <span><span id="w-pres">—</span> hPa</span></div>
+            <div><span data-i18n="lbl_cloud">Nuages</span> <span><span id="w-cloud">—</span>% <span class="progress-bar-bg"><span class="progress-bar-fill" id="w-cloud-bar" style="width:0%;"></span></span></span></div>
+            <div><span data-i18n="lbl_precip">Précipitation</span> <span><span id="w-precip">—</span> mm</span></div>
+            <div><span data-i18n="lbl_uv">UV</span> <span id="w-uv">—</span></div>
+            <div><span data-i18n="lbl_dew">Rosée</span> <span id="w-dew">—</span></div>
+            <div><span data-i18n="lbl_vis">Visibilité</span> <span id="w-vis">—</span></div>
+          </div>
+
+          <div class="agri-details">
+            <div class="agri-title" data-i18n="title_agri">Données Sol &amp; Radiations</div>
+            <div class="weather-details">
+              <div><span data-i18n="lbl_soil_temp">Temp. sol</span> <span><span id="w-soil-temp">—</span>°C</span></div>
+              <div><span data-i18n="lbl_soil_moist">Hum. sol</span> <span><span id="w-soil-moist">—</span> m³</span></div>
+              <div><span data-i18n="lbl_evapo">Évapotransp.</span> <span><span id="w-evapo">—</span> mm</span></div>
+              <div><span data-i18n="lbl_solar_rad">Rayonn.</span> <span><span id="w-solar-rad">—</span> W/m²</span></div>
+            </div>
+          </div>
+
+          <div class="fulfulde-reading" id="fulfulde-temp">Tolno ngulɓuuɓdi ko —°</div>
+        </div>
+
+        <!-- Sun -->
+        <div class="card col-4">
+          <h3>
+            <span class="card-title-icon" data-icon="sun"></span>
+            <span data-i18n="title_sun">Soleil (Naange)</span>
+          </h3>
+
+          <div class="canvas-container">
+            <canvas id="sun-canvas" width="250" height="100"></canvas>
+            <div class="canvas-overlay-text" id="sun-alt-text">Altitude —°</div>
+          </div>
+
+          <div class="astro-times">
+            <div><span data-i18n="t_dawn">Aube</span> <span id="t-dawn-astro">—</span></div>
+            <div><span data-i18n="t_sunrise">Lever</span> <span id="t-sunrise">—</span></div>
+            <div><span data-i18n="t_golden">Heure dorée</span> <span id="t-golden">—</span></div>
+            <div><span data-i18n="t_sunset">Coucher</span> <span id="t-sunset">—</span></div>
+            <div><span data-i18n="t_blue">Heure bleue</span> <span id="t-blue">—</span></div>
+            <div><span data-i18n="t_night">Nuit</span> <span id="t-night">—</span></div>
+          </div>
+
+          <div class="sci-astro-data">
+            <div><span data-i18n="lbl_ra">RA</span> <span id="sci-sun-ra">—</span></div>
+            <div><span data-i18n="lbl_dec">Dec</span> <span id="sci-sun-dec">—</span></div>
+          </div>
+
+          <div class="fulfulde-reading" id="fulfulde-sun">Naange — tolno —°</div>
+        </div>
+
+        <!-- Moon -->
+        <div class="card col-4">
+          <h3>
+            <span class="card-title-icon" data-icon="moon"></span>
+            <span data-i18n="title_moon">Lune (Leeuru)</span>
+          </h3>
+
+          <div class="moon-top">
+            <div class="moon-glyph">
+              <div id="moon-icon">🌑</div>
+              <div id="moon-phase-name">—</div>
+            </div>
+
+            <div class="compass-container" aria-label="Azimuth compass">
+              <span class="compass-point n">N</span>
+              <span class="compass-point e">E</span>
+              <span class="compass-point s">S</span>
+              <span class="compass-point w">W</span>
+              <div class="compass-indicator" id="compass-sun" style="transform: rotate(0deg);">
+                <div class="compass-sun-icon" data-icon="sun"></div>
+              </div>
+              <div class="compass-indicator" id="compass-moon" style="transform: rotate(0deg);">
+                <div class="compass-moon-icon" data-icon="moon"></div>
+              </div>
+              <div class="compass-indicator compass-qibla" id="compass-qibla" style="transform: rotate(0deg);">
+                <div class="compass-qibla-icon" data-icon="kaaba" title="Qibla"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="astro-times">
+            <div><span data-i18n="lbl_illum">Illum</span> <span><span id="moon-illum">—</span>%</span></div>
+            <div><span data-i18n="lbl_age">Âge</span> <span><span id="moon-age">—</span> <span data-i18n="lbl_days">j</span></span></div>
+            <div><span data-i18n="t_moonrise">Lever</span> <span id="t-moonrise">—</span></div>
+            <div><span data-i18n="t_moonset">Coucher</span> <span id="t-moonset">—</span></div>
+          </div>
+
+          <div class="sci-astro-data">
+            <div><span data-i18n="lbl_dist">Distance</span> <span id="sci-moon-dist">— km</span></div>
+            <div><span data-i18n="lbl_ra">RA</span> <span id="sci-moon-ra">—</span></div>
+            <div><span data-i18n="lbl_dec">Dec</span> <span id="sci-moon-dec">—</span></div>
+          </div>
+
+          <div class="fulfulde-reading" id="fulfulde-moon">Leeuru — tolno —°</div>
+        </div>
+
+        <!-- Prayer times -->
+        <div class="card col-6">
+          <h3>
+            <span class="card-title-icon" data-icon="mosque"></span>
+            <span data-i18n="title_prayer">Heures de prière</span>
+            <button class="btn-action btn-action-sm card-title-action" data-action="export-prayer">
+              <span class="btn-icon" data-icon="download"></span>
+              <span data-i18n="prayer_export">Exporter</span>
+            </button>
+          </h3>
+          <div id="prayer-next" class="prayer-next"></div>
+          <div id="prayer-times-list" class="prayer-list"></div>
+        </div>
+
+        <!-- Qibla -->
+        <div class="card col-6">
+          <h3>
+            <span class="card-title-icon" data-icon="kaaba"></span>
+            <span data-i18n="title_qibla">Qibla</span>
+          </h3>
+          <div class="qibla-card">
+            <div class="qibla-compass" aria-label="Qibla compass">
+              <div class="qibla-ring">
+                <span class="compass-point n">N</span>
+                <span class="compass-point e">E</span>
+                <span class="compass-point s">S</span>
+                <span class="compass-point w">W</span>
+              </div>
+              <div class="qibla-needle" id="qibla-compass-needle">
+                <div class="qibla-needle-icon" data-icon="kaaba"></div>
+              </div>
+            </div>
+            <div class="qibla-info">
+              <div>
+                <div class="qibla-info-label" data-i18n="qibla_bearing">Direction</div>
+                <div class="qibla-info-value" id="qibla-bearing">—</div>
+              </div>
+              <div>
+                <div class="qibla-info-label" data-i18n="qibla_distance">Distance</div>
+                <div class="qibla-info-value" id="qibla-distance">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 24h chart -->
+        <div class="card col-12">
+          <h3>
+            <span class="card-title-icon" data-icon="thermometer"></span>
+            <span data-i18n="title_hourly">Évolution 24 Heures</span>
+          </h3>
+          <div class="chart-container"><canvas id="hourlyChart"></canvas></div>
+        </div>
+
+        <!-- 7 days -->
+        <div class="card col-12">
+          <h3>
+            <span class="card-title-icon" data-icon="calendar"></span>
+            <span data-i18n="title_daily">Prévisions 7 Jours</span>
+          </h3>
+          <div class="daily-forecast" id="daily-container"></div>
+        </div>
+
+        <!-- Sky map -->
+        <div class="card col-12">
+          <h3>
+            <span class="card-title-icon" data-icon="star"></span>
+            <span data-i18n="title_sky_map">Carte du ciel</span>
+          </h3>
+          <p class="sky-map-hint" data-i18n="sky_map_hint">Vue depuis votre position — Nord en haut, Est à droite</p>
+          <div class="sky-map-container">
+            <canvas id="sky-map"></canvas>
+          </div>
+        </div>
+
+        <!-- 7-day weather trend chart -->
+        <div class="card col-6">
+          <h3>
+            <span class="card-title-icon" data-icon="thermometer"></span>
+            <span data-i18n="title_weekly">Tendance 7 jours</span>
+          </h3>
+          <div class="chart-container" style="height: 260px;">
+            <canvas id="weeklyChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Wind rose -->
+        <div class="card col-6">
+          <h3>
+            <span class="card-title-icon" data-icon="wind"></span>
+            <span data-i18n="title_wind_rose">Rose des vents (24 h)</span>
+          </h3>
+          <div class="chart-container" style="height: 260px;">
+            <canvas id="windRose"></canvas>
+          </div>
+        </div>
+
+        <!-- Visible planets -->
+        <div class="card col-6">
+          <h3>
+            <span class="card-title-icon" data-icon="globe"></span>
+            <span data-i18n="title_planets">Planètes visibles</span>
+          </h3>
+          <div id="planets-list" class="planets-list"></div>
+        </div>
+
+        <!-- Visible constellations -->
+        <div class="card col-6">
+          <h3>
+            <span class="card-title-icon" data-icon="star"></span>
+            <span data-i18n="title_constellations">Constellations visibles</span>
+          </h3>
+          <div id="constellations-list" class="constellations-list"></div>
+        </div>
+
+        <!-- Computed eclipses -->
+        <div class="card col-12">
+          <h3>
+            <span class="card-title-icon" data-icon="meteor"></span>
+            <span data-i18n="title_computed_eclipses">Éclipses à venir (calculées)</span>
+          </h3>
+          <div id="eclipses-list" class="eclipses-list"></div>
+        </div>
+
+        <!-- Astronomical events -->
+        <div class="card col-12">
+          <h3>
+            <span class="card-title-icon" data-icon="sparkles"></span>
+            <span data-i18n="title_events">Événements astronomiques</span>
+            <button class="btn-action btn-action-sm card-title-action" data-action="export-events">
+              <span class="btn-icon" data-icon="download"></span>
+              <span data-i18n="events_export">Exporter</span>
+            </button>
+          </h3>
+          <div id="events-list" class="events-list"></div>
+        </div>
+
+        <!-- Interpretation -->
+        <div class="card col-12">
+          <h3>
+            <span class="card-title-icon" data-icon="book-open"></span>
+            <span data-i18n="title_astro_interp">Interprétation Astronomique</span>
+          </h3>
+          <div id="astro-interpretation">—</div>
+          <div class="card-actions">
+            <button class="btn-action" data-action="read-interpretation">
+              <span class="btn-icon" data-icon="volume-2"></span>
+              <span data-i18n="btn_audio">Écouter</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer class="brand-footer">
+      <span class="brand-footer-logo"></span>
+      <p>Pulaagu — Waqtu, Tagoodi e Pinal</p>
+      <span class="brand-mark">Calendrier Fulfulde · 2026</span>
+    </footer>
+  </main>
+
+</body>
+</html>
