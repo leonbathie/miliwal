@@ -34,11 +34,15 @@ export function renderGallery(): void {
       className: 'gallery-illu',
     });
 
+    const safeSvg = svgFallback.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+
+    // On utilise class="gallery-illu" pour que l'image prenne exactement
+    // le même espace et les mêmes dimensions que le SVG d'origine.
     const visual = item.photo
       ? `
-        <div class="gallery-visual gallery-visual-photo">
-          <img src="${item.photo}" alt="${title}" loading="lazy"
-               onerror="this.parentElement.classList.remove('gallery-visual-photo');this.parentElement.innerHTML='${svgFallback.replace(/'/g, '&#39;')}';"/>
+        <div class="gallery-visual">
+          <img src="${item.photo}" alt="${title}" loading="lazy" class="gallery-illu" style="border-radius: 8px;"
+               onerror="this.outerHTML='${safeSvg}';"/>
         </div>`
       : `<div class="gallery-visual">${svgFallback}</div>`;
 
