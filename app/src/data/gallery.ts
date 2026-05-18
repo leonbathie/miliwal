@@ -27,7 +27,7 @@ export interface GalleryItem {
  */
 export const GALLERY: GalleryItem[] = [
   {
-    photo: '/gallery/zebu.webp',
+    photo: '/gallery/zebu.webm',
     illustration: 'zebu',
     titleFr: 'Le zébu peul',
     titleEn: 'The Fulani zebu',

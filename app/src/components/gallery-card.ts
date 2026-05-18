@@ -35,15 +35,23 @@ export function renderGallery(): void {
     });
 
     const safeSvg = svgFallback.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    
+    // Détecte si le fichier est une vidéo (.webm ou .mp4)
+    const isVideo = item.photo?.match(/\.(webm|mp4)$/i);
 
-    // On utilise "gallery-visual-photo" pour que l'image remplisse 100% de la carte
+    // On utilise "gallery-visual-photo" pour que l'image/vidéo remplisse 100% de la carte
     // avec object-fit: cover.
     const visual = item.photo
-      ? `
-        <div class="gallery-visual gallery-visual-photo">
-          <img src="${item.photo}" alt="${title}" loading="lazy"
-               onerror="this.outerHTML='${safeSvg}';"/>
-        </div>`
+      ? (isVideo
+        ? `<div class="gallery-visual gallery-visual-photo">
+             <video src="${item.photo}" autoplay loop muted playsinline 
+                    style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                    onerror="this.outerHTML='${safeSvg}';"></video>
+           </div>`
+        : `<div class="gallery-visual gallery-visual-photo">
+             <img src="${item.photo}" alt="${title}" loading="lazy"
+                  onerror="this.outerHTML='${safeSvg}';"/>
+           </div>`)
       : `<div class="gallery-visual">${svgFallback}</div>`;
 
     return `
