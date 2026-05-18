@@ -36,12 +36,12 @@ export function renderGallery(): void {
 
     const safeSvg = svgFallback.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 
-    // On utilise class="gallery-illu" pour que l'image prenne exactement
-    // le même espace et les mêmes dimensions que le SVG d'origine.
+    // On utilise "gallery-visual-photo" pour que l'image remplisse 100% de la carte
+    // avec object-fit: cover.
     const visual = item.photo
       ? `
-        <div class="gallery-visual">
-          <img src="${item.photo}" alt="${title}" loading="lazy" class="gallery-illu" style="border-radius: 8px;"
+        <div class="gallery-visual gallery-visual-photo">
+          <img src="${item.photo}" alt="${title}" loading="lazy"
                onerror="this.outerHTML='${safeSvg}';"/>
         </div>`
       : `<div class="gallery-visual">${svgFallback}</div>`;
