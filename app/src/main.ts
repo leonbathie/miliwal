@@ -163,6 +163,8 @@ function bindMenuAutoClose(): void {
     if (!target) return;
     // Click inside the hamburger button: handled by the action delegator above.
     if (target.closest('[data-action="toggle-menu"]')) return;
+    // Don't close if interacting with the language select
+    if (target.closest('.lang-select')) return;
     // Click inside the drawer: close (any drawer action takes effect, then menu closes)
     if (target.closest('#nav-drawer')) {
       closeMenu();
@@ -288,13 +290,6 @@ function bindActions(): void {
         // Re-render charts + sky map so they pick up the new CSS variables
         rerenderWeatherFromCache();
         renderSkyMap();
-        break;
-      }
-      case 'toggle-menu': {
-        const nav = document.getElementById('main-nav');
-        if (!nav) break;
-        const isOpen = nav.classList.toggle('menu-open');
-        actionEl.setAttribute('aria-expanded', String(isOpen));
         break;
       }
       case 'open-tools':

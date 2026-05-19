@@ -2671,7 +2671,7 @@ h2[data-i18n="lexicon_title"]::after {
   .nav-brand { gap: 6px; margin-right: 0; flex-shrink: 0; }
   .brand-logo { width: 24px; height: 24px; }
   .brand-name { font-size: 0.95rem; }
-  .nav-spacer { display: none; }
+  .nav-spacer { display: block; flex: 1 1 auto; }
   nav button, .lang-select {
     font-size: 12px;
     padding: 6px 10px;
